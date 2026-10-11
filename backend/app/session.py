@@ -13,7 +13,9 @@ from redis.asyncio import Redis
 
 from app.extract import Extracted
 from app.extract.llm_review import Suggestion
+from app.extract.model import Oddity
 from app.narrowing import CONFIRM, NOTHING_FITS, Known
+from app.schemas import Issue
 from app.search import Candidate
 from app.search.similar import Similar
 from app.search.twins import TwinRef
@@ -64,6 +66,11 @@ class Session(BaseModel):
     type_reason: str | None = None
     # Подсказки второго слоя: куда поставить непонятые куски текста (`extract.llm_review`).
     suggestions: list[Suggestion] = []
+    # Значения из текста, которых у такого товара не бывает, по мнению модели («Материал: глина»
+    # у тумбочки, `extract.llm_fill.find_oddities`) — замечания для позиции `llm_for`.
+    oddities: list[Oddity] = []
+    # Значения, каких у такого товара не бывает, по мнению модели (`extract.llm_sanity`).
+    sanity: list[Issue] = []
 
     @classmethod
     def new(cls, name: str, description: str) -> "Session":

@@ -127,6 +127,24 @@ def _split_known(fragment: str, portal: PortalNames) -> tuple[str, str] | None:
     return None
 
 
+# «Макс. диаметр отверстия в дереве 38 мм»: слова без цифр и запятых, в конце число с единицей.
+_MEASURED = re.compile(
+    r"^(?P<label>[^\d,:()]{3,60}?)\s+(?P<value>\d+(?:[.,]\d+)?(?:\s*[^\s\d,;()]{1,12}){0,2})$"
+)
+
+
+def _split_measured(fragment: str) -> tuple[str, str] | None:
+    """Число, которое текст сам привязал к словам: «слова число единица» целой фразой.
+
+    Подписи нет ни в позиции, ни на портале — это новая характеристика, а не значение чужого
+    поля: её увидит поставщик и подтвердит модератор. Перечень через запятую («…, бит-насадки
+    (5 шт») и фраза с числом в середине так не читаются: там число относится к части фразы."""
+    m = _MEASURED.match(fragment)
+    if m is None or len(_TOKEN.findall(m["label"])) > MAX_LABEL_WORDS:
+        return None
+    return m["label"].strip(), m["value"]
+
+
 def _known_tail(raw: str, portal: PortalNames) -> int | None:
     """Где кончается значение: «глина, размер 52» — после запятой своя пара с меткой, известной
     порталу («размер 52»). «хлопок, полиэстер» — перечень одного свойства, его не режем."""
@@ -164,9 +182,14 @@ def extra_pairs(
     """Свойства вне шаблона из описания. `known` — `fold` имён и синонимов шаблона и КТРУ."""
     out: list[ExtraPair] = []
     seen: set[str] = set()
+    # Текст разбит на фразы самим поставщиком (строки, «;», «|»): фраза — одно свойство. В сплошной
+    # прозе границ свойств нет, и «слова число» целой строкой — не подпись со значением.
+    structured = sum(1 for _ in _FRAGMENT.finditer(description)) > 1
     for label, raw, a, b in _pairs(description):
         if not label:
             split = _split_known(raw.strip(), portal)
+            if split is None and structured:
+                split = _split_measured(raw.strip())
             if split is None:
                 continue
             label, raw = split

@@ -15,7 +15,13 @@ build/
 !.env.example
 
 # данные и веса (не версионируем)
-data/
+data/*
+!data/catalog/
+data/catalog/*
+# Очищенный КТРУ для ветки cleand-json; исходники, индексы и отчёты остаются локальными.
+!data/catalog/ktru_xml.cleaned.json
+# Результаты оценок и прочие локальные данные бэкенда (прежде их скрывало правило `data/`).
+backend/data/
 dataset/
 weights/
 *.gguf

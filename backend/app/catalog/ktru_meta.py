@@ -8,6 +8,7 @@
 """
 
 import json
+from collections.abc import Callable
 from dataclasses import dataclass
 from functools import lru_cache
 from pathlib import Path
@@ -94,6 +95,41 @@ def _why(kept: Position, others: list[Position], meta: dict[str, KtruMeta]) -> s
     return "даты и версии совпадают, взята первая"
 
 
+def _lists(p: Position) -> tuple[str, str, dict[str, frozenset[str]]]:
+    values = {fold(c.name): frozenset(fold(v) for v in c.values) for c in p.characteristics}
+    return fold(p.name), p.unit or "", values
+
+
+def drop_wider(
+    positions: list[Position], fits: Callable[[Position], bool]
+) -> tuple[list[Position], dict[str, list[str]]]:
+    """Общая позиция не предлагается, пока подходит более точная: (позиции, скрытая → точные).
+
+    Шаблон КТРУ (`isTemplate`) перечисляет все варианты, позиции из него — по одному: «Шуруповерт»
+    28.24.11.000-00000032 с «Тип питания: От сети, От аккумуляторных батарей» и …-00000030 только
+    с «От аккумуляторных батарей». Обе действуют (actual, ACTIVE), и на «от аккумулятора» подходят
+    обе — поставщик видел две одинаковые позиции. Общая — то же наименование, единица и
+    характеристики, а перечень каждой у точной — часть её перечня. Точные все отпали (`fits`) —
+    общая остаётся: по правилам КТРУ укрупнённая позиция берётся, когда точной нет.
+    """
+    lists = {p.code: _lists(p) for p in positions}
+    alive = [p for p in positions if fits(p)]
+    hidden: dict[str, list[str]] = {}
+    for wide in positions:
+        name, unit, mine = lists[wide.code]
+        exact = []
+        for p in alive:
+            other_name, other_unit, theirs = lists[p.code]
+            if p.code == wide.code or (other_name, other_unit) != (name, unit):
+                continue
+            same_fields = theirs.keys() == mine.keys() and theirs != mine
+            if same_fields and all(theirs[k] <= mine[k] for k in theirs):
+                exact.append(p.code)
+        if exact:
+            hidden[wide.code] = exact
+    return [p for p in positions if p.code not in hidden], hidden
+
+
 def merge_same(positions: list[Position]) -> tuple[list[Position], list[KtruMerge]]:
     """Позиции с одинаковыми наименованием, единицей и характеристиками — одна, более свежая."""
     groups: dict[tuple[object, ...], list[Position]] = {}
@@ -124,3 +160,57 @@ def merge_same(positions: list[Position]) -> tuple[list[Position], list[KtruMerg
             )
         )
     return [p for p in positions if p.code in keep], merges
+
+
+def _narrower(child: Position, template: Position, known: set[str]) -> bool:
+    """Позиция из шаблона уже его: общие характеристики — части перечней шаблона, хотя бы одна
+    сужена, и каждая суженная известна из текста или ответа (иначе это был бы выбор за
+    поставщика: «От аккумуляторных батарей», когда о питании ничего не сказано). Лишние для неё
+    характеристики шаблона позиция может не иметь: у дрели «От сети» нет «Ёмкости аккумулятора»."""
+    mine = {fold(c.name): c for c in template.characteristics}
+    if fold(child.name) != fold(template.name):
+        return False
+    narrowed = False
+    for c in child.characteristics:
+        t = mine.get(fold(c.name))
+        if t is None:
+            continue
+        values, wider = {fold(v) for v in c.values}, {fold(v) for v in t.values}
+        if not values <= wider or (values != wider and fold(c.name) not in known):
+            return False
+        narrowed = narrowed or values != wider
+    return narrowed
+
+
+def prefer_refined(
+    positions: list[Position], known: set[str]
+) -> tuple[list[Position], list[KtruMerge]]:
+    """Шаблон КТРУ и позиция, созданная из него с более узким перечнем, обе подходят тексту
+    («Шуруповерт» 28.24.11.000-00000032 — шаблон «От сети, От аккумуляторных батарей», …-00000030
+    — только «От аккумуляторных батарей»): остаётся позиция из шаблона — она точнее. Если текст
+    ей противоречит, её уже нет среди подходящих, и остаётся шаблон. `known` — имена (fold)
+    характеристик, известных из текста или ответов; `positions` — уже подходящие им."""
+    meta = load_meta()
+    codes = {p.code: p for p in positions}
+    drop: dict[str, Position] = {}
+    for p in positions:
+        m = meta.get(p.code)
+        parent = codes.get(m.parent) if m and m.parent else None
+        if parent is not None and _narrower(p, parent, known):
+            drop[parent.code] = p
+    if not drop:
+        return positions, []
+    merges = [
+        KtruMerge(
+            kept=child.code,
+            dropped=[code],
+            name=child.name,
+            message=(
+                f"В КТРУ «{child.name}» есть шаблон {code} и позиция {child.code}, созданная из "
+                f"него с более узкими значениями. Описанию подходят обе — взята {child.code}: "
+                "она точнее описывает товар."
+            ),
+        )
+        for code, child in drop.items()
+    ]
+    return [p for p in positions if p.code not in drop], merges

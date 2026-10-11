@@ -1,0 +1,15 @@
+services:
+  migrate:
+    image: tenderhack-cleaned-backend:cleand-json
+  api:
+    image: tenderhack-cleaned-backend:cleand-json
+    environment:
+      KTRU_PATHS: data/catalog/ktru_xml.cleaned.json
+  worker:
+    image: tenderhack-cleaned-backend:cleand-json
+    environment:
+      KTRU_PATHS: data/catalog/ktru_xml.cleaned.json
+    deploy:
+      replicas: 1
+  web:
+    image: tenderhack-cleaned-web:cleand-json

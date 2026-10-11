@@ -8,6 +8,9 @@ import { fieldId } from './fieldId'
 import { OriginMark } from './OriginMark'
 import { SourceIcon } from './SourceIcon'
 
+/** Замечания разбора текста, которые показываются под полем вдобавок к главному. */
+const TEXT_NOTE_RULES = new Set(['llm.sanity', 'ktru.not_in_list'])
+
 const HELPER_COLOR: Record<Helper['tone'], string> = {
   error: 'error.main',
   warn: 'warning.dark',
@@ -212,7 +215,10 @@ export function CharacteristicFields({ fields, issues, readOnly, onChange, onCon
         const empty = !f.value.trim()
         const note = noteOf(f, issue, relation, helper, hint)
         const tone = note.tone === 'error' ? 'error' : note.tone === 'warn' || status === 'требует проверки' ? 'warn' : null
-        const where = valueSource(f, answeredAt?.[f.name]) || (empty ? 'В описании не нашли' : '')
+        // Замечания разбора текста к тому же полю: «в тексте «глина», в перечне КТРУ такого нет», «похоже на ошибку».
+        const textNotes = (issues.get(f.name) ?? []).filter((i) => i !== issue && TEXT_NOTE_RULES.has(i.rule))
+        const saidOther = (issues.get(f.name) ?? []).some((i) => i.rule === 'ktru.not_in_list')
+        const where = valueSource(f, answeredAt?.[f.name]) || (empty ? (saidOther ? 'В описании другое значение — его нет в перечне' : 'В описании не нашли') : '')
         // За значком: откуда значение и почему оно такое (соответствие КТРУ, приведение к справочнику).
         const why = [where]
         if (relation && relation.text !== note.text && relation.text !== issue?.message) why.push(relation.text)
@@ -255,6 +261,11 @@ export function CharacteristicFields({ fields, issues, readOnly, onChange, onCon
                 {relation.text}
               </Box>
             )}
+            {textNotes.map((i) => (
+              <Box key={i.message} component="span" sx={{ color: HELPER_COLOR.warn }}>
+                {i.message}
+              </Box>
+            ))}
             {f.origin === 'new' && <Box component="span" sx={{ color: 'text.secondary' }}>Новая характеристика: её проверит модератор</Box>}
           </Box>
         )

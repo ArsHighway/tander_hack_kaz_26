@@ -22,6 +22,7 @@ import {
   submissionFields,
   withOwn,
   type FieldState,
+  withTextNotes,
 } from './formModel.ts'
 
 const char = (over: Partial<CharacteristicOut>): CharacteristicOut => ({
@@ -530,4 +531,15 @@ test('путь категории для подписи: последний уз
   assert.equal(categoryPath(['Столы письменные'], 'столы письменные'), null)
   assert.equal(categoryPath([], 'Стол'), null)
   assert.equal(categoryPath(undefined), null)
+})
+
+test('withTextNotes keeps text-only notes after /check until the field is filled', () => {
+  const note = (field: string, rule: string): Issue => ({ field, kind: 'mismatch', severity: 'warn', message: `${rule} ${field}`, why: '', rule, fix: null })
+  const sanity = note('characteristics.Материал', 'llm.sanity')
+  const listed = note('characteristics.Вид материала корпуса', 'ktru.not_in_list')
+  const other = note('characteristics.Цвет', 'other')
+  const fields = [field({ name: 'Материал', value: 'глина', initial: 'глина' }), field({ name: 'Вид материала корпуса', value: '', initial: '' })]
+  assert.deepEqual(withTextNotes([], [sanity, listed, other], fields), [sanity, listed])
+  const filled = [fields[0], { ...fields[1], value: 'ЛДСП', edited: true }]
+  assert.deepEqual(withTextNotes([], [sanity, listed], filled), [sanity])
 })

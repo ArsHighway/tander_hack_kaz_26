@@ -35,8 +35,10 @@ def main() -> None:
     p.add_argument("--out", type=Path, default=META_PATH)
     args = p.parse_args()
     positions = Catalog.load([args.catalog]).all()
-    same = Counter(_signature(pos) for pos in positions)
-    wanted = {pos.code for pos in positions if same[_signature(pos)] > 1}
+    # Одноимённые позиции: среди них и одинаковые (`merge_same`), и шаблон с позицией, созданной
+    # из него с более узким перечнем (`prefer_refined`).
+    same = Counter(_signature(pos)[:2] for pos in positions)
+    wanted = {pos.code for pos in positions if same[_signature(pos)[:2]] > 1}
     meta: dict[str, dict[str, object]] = {}
     for _, data in kx.read_xml_files(args.xml, kx.Selection()):
         for m in _POSITION.finditer(data):

@@ -114,6 +114,8 @@ flowchart LR
 - [docs/model-choice.md](docs/model-choice.md) — выбор LLM замером на карточках портала.
 - [docs/scaling.md](docs/scaling.md) — масштабирование: пакет порциями по воркерам, несколько процессов API, лимиты
   LLM, HNSW, нагрузочные замеры.
+- [docs/ktru-cleanup.md](docs/ktru-cleanup.md) — очищенный справочник КТРУ трёх тем (1 233 позиции без шаблонов,
+  `data/catalog/ktru_xml.cleaned.json`, лежит в репозитории и подключён в `.env.example`).
 - [models/README.md](models/README.md) — какие GGUF-файлы нужны сервисам `llm` и `embed` и куда их класть.
 - [docs/bpmn/](docs/bpmn/) — BPMN 2.0 процесса (`module.bpmn` открывается в bpmn.io и Camunda Modeler) и картинка.
 - [docs/qa/](docs/qa/) — аудит по ТЗ и проверки враждебным вводом.

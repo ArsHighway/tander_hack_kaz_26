@@ -213,6 +213,9 @@ def build_deps(res: Resources) -> "Deps":
         llm_budget_s=res.settings.llm_budget_s,
         llm_enabled=res.settings.llm_enabled,
         rerank_types=res.settings.llm_rerank_types,
+        pick_options=res.settings.llm_pick_options,
+        sanity=res.settings.llm_sanity,
+        structure=res.settings.llm_structure,
         review_llm=CachedChat(res.review_llm, res.redis, ttl_s=res.settings.llm_cache_ttl_s)
         if res.review_llm is not None
         else None,

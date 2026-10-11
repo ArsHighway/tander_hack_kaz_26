@@ -34,6 +34,7 @@ import {
   mergeFields,
   splitPasted,
   withOwn,
+  withTextNotes,
   type FieldState,
 } from './formModel.ts'
 import { CONFIRM, NOTHING_FITS } from './ktruView.ts'
@@ -325,8 +326,10 @@ export function CreatePage() {
 
   // Правка человека: замечания пересчитываются проверкой модуля, а не угадываются на экране.
   const cardRef = useRef(card)
+  const fieldsRef = useRef(fields)
   useLayoutEffect(() => {
     cardRef.current = card
+    fieldsRef.current = fields
   })
   useEffect(() => {
     if (edits === 0 || pending || !out?.ktru.final_code || submitted) return
@@ -335,7 +338,7 @@ export function CreatePage() {
       const g = generation.current
       api
         .check(cardRef.current)
-        .then((r) => !cancelled && g === generation.current && setIssues(r.issues))
+        .then((r) => !cancelled && g === generation.current && setIssues(withTextNotes(r.issues, out.issues, fieldsRef.current)))
         .catch(() => undefined)
     }, RECHECK_MS)
     return () => { cancelled = true; clearTimeout(timer) }
@@ -405,7 +408,7 @@ export function CreatePage() {
       if (g !== generation.current) return
       // Сразу на экран: если отправить нельзя, фокус ставится на уже нарисованную плашку или поле.
       flushSync(() => {
-        setIssues(check.issues)
+        setIssues(withTextNotes(check.issues, out?.issues ?? [], fields))
         setChecked(check.issues)
       })
       const report = submitState(check.issues, fields)

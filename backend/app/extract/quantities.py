@@ -207,6 +207,58 @@ def _dimension(text: str, start: int, end: int) -> bool:
     )
 
 
+# Целое от шести цифр без единицы и подписи — номер (ID СТЕ, артикул, штрихкод), а не величина:
+# количество и размер так не пишут.
+ID_DIGITS = 6
+
+
+def in_designation(text: str, start: int, end: int) -> bool:
+    """Число — часть обозначения модели или артикула («BAS-36N-Li», «DB3DL2», «ДА-10,8/2»): в том
+    же слове рядом с ним латинская или заглавная буква. «5-слойный», «2-х» — не обозначение."""
+    a, b = start, end
+    while a > 0 and not text[a - 1].isspace():
+        a -= 1
+    while b < len(text) and not text[b].isspace():
+        b += 1
+
+    def marked(part: str) -> bool:
+        return any(ch.isalpha() and (ch.isascii() or ch.isupper()) for ch in part)
+
+    # Буквы перед числом в том же слове — обозначение («BAS-36», «DB3»); после — если это не
+    # единица, написанная слитно («18V», «16ГБ»).
+    return marked(text[a:start]) or (marked(text[end:b]) and not _with_unit(text, end))
+
+
+# «на 1ой скорости», «2-я группа»: порядковое числительное — номер по порядку, а не величина.
+_ORDINAL = re.compile(r"-?(?:ой|ый|ий|ая|ое|го|му|й|я)(?![\p{L}])", re.IGNORECASE)
+
+
+def identifier_like(text: str, start: int, end: int) -> bool:
+    """Число без единицы — номер, порядковое или часть обозначения, а не величина, какое бы
+    правило его ни взяло: «1160330 Отвертка» — не миллион отвёрток, «BAS-36N-Li» — не 36 оборотов,
+    «на 1ой скорости» — не одна штука."""
+    number = text[start:end]
+    if _with_unit(text, end):
+        return False
+    if number.isdigit() and len(number) >= ID_DIGITS:
+        return True
+    return bool(_ORDINAL.match(text, end)) or in_designation(text, start, end)
+
+
+_LATIN_BEFORE = re.compile(r"[A-Za-z][A-Za-z0-9]*[\s-]?\Z")
+
+
+def _model_code(text: str, start: int, end: int) -> bool:
+    """Число внутри модели — «PSR 14.4», «DCD-14N-7», «ДУ-1100»: не количество и не размер."""
+    before = _LATIN_BEFORE.search(text[max(0, start - 12) : start])
+    paper = before is not None and re.fullmatch(r"[AaBb]\d[\s-]?", before[0]) is not None  # A4 80
+    return bool(
+        (before is not None and not paper)
+        or re.match(r"[\p{L}]", text[end : end + 1])
+        or re.search(r"\p{L}-\Z", text[max(0, start - 3) : start])
+    )
+
+
 def bare_values(
     field: Field, text: str, specs: list[CharacteristicSpec], found: dict[str, Extracted]
 ) -> list[Extracted]:
@@ -224,6 +276,9 @@ def bare_values(
             or _with_unit(text, end)
             or _bound_before(text, start)
             or _YEAR.match(m.group("num"))
+            or in_designation(text, start, end)
+            or (m.group("num").isdigit() and len(m.group("num")) >= ID_DIGITS)
+            or _model_code(text, start, end)
         ):
             continue
         number = _number(m.group("num"))

@@ -233,3 +233,29 @@ def test_no_match_keeps_the_supplier_value() -> None:
     [got] = _match_lists(ListMatch(value=None, quote=""))
     assert got.raw_value == "встроенный аккумулятор"
     assert got.method == "rule" and got.was is None
+
+
+def test_number_outside_a_numeric_list_is_not_sent_to_the_model() -> None:
+    """Число к перечню приводит код, а не модель: «1010 г» при перечне «0.3, 0.4» она «приводила»
+    к 0.3 кг."""
+    from app.catalog import CharacteristicSpec, Position
+    from app.extract.model import Extracted
+    from app.pipeline import _match_lists
+    from app.schemas import Span
+
+    weight = CharacteristicSpec(name="Вес", kind="quantitative", unit="кг", values=["0.3", "0.4"])
+    position = Position(
+        code="T-2", name="Отвертка", okpd2="25.73", characteristics=[weight], source="test"
+    )
+    text = "Вес: 1010.00000 г"
+    rule = Extracted(
+        name="Вес",
+        raw_value="1010.00000",
+        raw_unit="г",
+        source=Span(field="description", start=5, end=15, text="1010.00000"),
+        method="rule",
+    )
+    llm = FakeLLM()  # любой вызов модели — ошибка теста
+    session = SimpleNamespace(name="Отвертка", description=text)
+    got = asyncio.run(_match_lists(session, [rule], position, _deps(llm)))  # type: ignore[arg-type]
+    assert got == [rule] and llm.calls == []

@@ -24,6 +24,9 @@ x-backend-env: &backend-env
   # Сколько ждать модель в шаге мастера и строке пакета, с (пусто — без предела).
   LLM_BUDGET_S: ${LLM_BUDGET_S-15}
   LLM_RERANK_TYPES: ${LLM_RERANK_TYPES:-true}
+  LLM_PICK_OPTIONS: ${LLM_PICK_OPTIONS:-true}
+  LLM_SANITY: ${LLM_SANITY:-true}
+  LLM_STRUCTURE: ${LLM_STRUCTURE:-true}
   # Массовая загрузка: строк в порции очереди и строк одновременно в одном воркере.
   BATCH_CHUNK_ROWS: ${BATCH_CHUNK_ROWS:-20}
   WORKER_CONCURRENCY: ${WORKER_CONCURRENCY:-4}

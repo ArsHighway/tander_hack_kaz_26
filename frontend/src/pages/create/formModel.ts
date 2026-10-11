@@ -356,3 +356,25 @@ export function submissionFields(card: CardIn, accepted: CharacteristicOut[]): F
   // Новое свойство поставщика модератор видит с пометкой «новая»; портальное вне шаблона — по замечанию модуля.
   return buildFields(chars, null).map((f) => ({ ...f, extra: f.origin === 'new' }))
 }
+
+/** Замечания, которые видит только разбор текста (`/autofill`), а не проверка карточки (`/check`). */
+const TEXT_ONLY_RULES = new Set(['llm.sanity', 'ktru.not_in_list', 'указание для модели в тексте не выполняется', 'одинаковые позиции КТРУ — берётся более свежая'])
+
+/**
+ * Итог `/check` после правки и замечания разбора текста, которые проверка карточки не повторяет:
+ * «Похоже на ошибку: тумбочка из глины» и «в тексте «глина», а в перечне КТРУ такого нет». Без них
+ * перепроверка после ответа на вопрос стирала их с экрана. Замечание о поле уходит, когда человек
+ * поле заполнил или исправил.
+ */
+export function withTextNotes(checked: Issue[], parsed: Issue[], fields: FieldState[]): Issue[] {
+  const byField = new Map(fields.map((f) => [`characteristics.${f.name}`, f]))
+  const seen = new Set(checked.map((i) => `${i.field}|${i.message}`))
+  const kept = parsed.filter((i) => {
+    if (!TEXT_ONLY_RULES.has(i.rule) || seen.has(`${i.field}|${i.message}`)) return false
+    const f = byField.get(i.field)
+    if (!f) return true
+    if (i.rule === 'ktru.not_in_list') return !f.value.trim()
+    return !changed(f)
+  })
+  return [...checked, ...kept]
+}

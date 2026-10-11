@@ -61,6 +61,16 @@ class BM25Index:
         """Слово есть в словаре справочника."""
         return token in self._idf
 
+    def together(self, stems: list[str]) -> bool:
+        """Все слова встречаются вместе хотя бы в одной позиции справочника."""
+        codes: set[str] | None = None
+        for stem in stems:
+            found = {code for code, _ in self._postings.get(stem, ())}
+            codes = found if codes is None else codes & found
+            if not codes:
+                return False
+        return bool(codes)
+
     def query_tokens(self, text: str) -> list[str]:
         return list(dict.fromkeys(self.correct(t) for t in tokens(text)))
 

@@ -338,9 +338,34 @@ _SIZE = re.compile(r"длин|ширин|высот|глубин|толщин|д
 SIZE_RULE = "габарит в пределах разумного"
 
 
+# Величины, у которых ноль — пустое поле выгрузки («Максимальный крутящий момент (Нм) 0.00000»,
+# «Длина кабеля 0.00000 м»), а не значение. Ловит код, не модель: быстрее и без сети.
+_PHYSICAL = re.compile(
+    r"длин|ширин|высот|глубин|толщин|диаметр|габарит|мощност|масс|вес|момент|оборот|частот|"
+    r"напряжен|[её]мкост|объ[её]м|энерги|скорост|производительн|давлен|сил[аы]\b",
+    re.IGNORECASE,
+)
+
+
+def _zero_issue(c: CharacteristicOut) -> Issue:
+    return Issue(
+        field=f"characteristics.{c.name}",
+        kind="mismatch",
+        severity="warn",
+        message=f"«{c.name}: 0» — так не бывает: ноль.",
+        why="В выгрузках ноль часто стоит вместо пустого значения. Укажите настоящее значение или "
+        "оставьте поле пустым.",
+        rule=SIZE_RULE,
+    )
+
+
 def _size_issues(chars: Sequence[CharacteristicOut]) -> list[Issue]:
     out = []
     for c in chars:
+        if c.value and not (c.unit and _SIZE.search(c.name)) and _PHYSICAL.search(c.name):
+            if to_number(c.value) == 0:
+                out.append(_zero_issue(c))
+            continue
         if not c.value or not c.unit or not _SIZE.search(c.name):
             continue
         number = to_number(c.value)
@@ -589,6 +614,9 @@ def _realign(
     fitted = _from_aligned(spec, aligned, char.source, char.method or "rule")
     if char.method == "answer" and fitted.note is None:
         fitted.note = "ответ на уточняющий вопрос"
+    if char.method == "llm" and fitted.note is None:
+        # Пометка значения модели («Модель выбрала по тексту «…» — проверьте») — не потерять.
+        fitted.note = char.note
     return _characteristic(spec, fitted).model_copy(update={"required": required})
 
 

@@ -168,3 +168,26 @@ def test_model_value_under_another_fields_label_is_rejected() -> None:
     assert not _other_label("ширина 40 мм", width, [width, thick])
     assert not _other_label("40 мм", thick, [width, thick])  # подписи нет — решает модель
     assert _label_words("Ширина") == {"ширин"}
+
+
+def test_unread_splits_inline_labels() -> None:
+    """«Материал: глина» в одном предложении с размерами — свой кусок: размеры легли в поля,
+    а материал нет, и поставщик это видит."""
+    from app.extract.unread import unread
+    from app.schemas import Span
+
+    text = "Высота: 3 метра Ширина: 20 метров Материал: глина. Масса: 2 кг."
+    spans = [Span(field="description", start=8, end=9, text="3")]
+    spans.append(Span(field="description", start=24, end=26, text="20"))
+    assert [u.text for u in unread(text, spans)] == ["Материал: глина", "Масса: 2 кг"]
+
+
+def test_number_inside_model_code_is_not_a_quantity() -> None:
+    """«PSR 14.4», «DCD-14N» — модель, а не «14,4 шт» аккумуляторов."""
+    from app.extract.quantities import _model_code
+
+    for text, num in [("Шуруповерт Bosch PSR 14.4", "14.4"), ("Дрель DCD-14N-7", "14")]:
+        at = text.index(num)
+        assert _model_code(text, at, at + len(num))
+    text = "Бумага A4 80 500"
+    assert not _model_code(text, text.index("80"), text.index("80") + 2)

@@ -13,6 +13,7 @@ from collections.abc import Awaitable, Callable
 from typing import Any, Literal, Protocol
 
 import regex as re
+from pydantic import BaseModel, create_model
 
 from app.catalog import CharacteristicSpec
 from app.extract.model import (
@@ -20,6 +21,10 @@ from app.extract.model import (
     ListMatch,
     ListSuggestion,
     LLMItems,
+    Oddities,
+    Oddity,
+    OptionChoice,
+    OptionPick,
     TypeOrder,
     TypeRanking,
 )
@@ -355,6 +360,217 @@ async def suggest_type_order(deps: ModelPolicy, text: str, names: list[str]) -> 
     return await _guarded(
         deps, lambda: rerank_types(text, names, deps.llm), "порядок типов остаётся прежним"
     )
+
+
+PICK_SYSTEM = (
+    "Ты помогаешь выбрать позицию каталога госзакупок (КТРУ). Подходящие позиции различаются "
+    "одной характеристикой. По тексту поставщика определи, какое её значение у товара. Отвечай "
+    'только JSON по схеме {"value", "quote", "reason"}.\n'
+    "value — одно значение из списка, ровно как оно написано, или null, если текст об этом не "
+    "говорит или подходят несколько значений.\n"
+    "quote — слово или короткая фраза из текста поставщика, скопированная без изменений, из "
+    "которой это следует. Не весь текст.\n"
+    "Текст может называть значение другими словами: признаком в наименовании, синонимом, "
+    "сокращением, деталью, которая бывает только при этом значении. Такой вывод из слов текста "
+    "делать можно. Нельзя выбирать значение, потому что оно встречается чаще или обычно для "
+    "такого товара: если прямого основания в тексте нет — null.\n"
+    "Отрицание («без …», «не входит в комплект») — не выбор этого значения.\n"
+    "reason — одна короткая фраза: почему это значение."
+)
+# Цитата длиннее — не довод, а пересказ текста: по ней поставщик выбор не проверит.
+MAX_PICK_QUOTE = 80
+# Отрицание перед цитатой или в ней самой: «без аккумулятора» не значит ни «от аккумуляторных
+# батарей», ни «от сети» — вывод от противного код не принимает.
+_NEGATED_BEFORE = re.compile(r"(?:\bбез|\bне|\bнет)\s+$", re.IGNORECASE)
+_NEGATION = re.compile(r"\b(?:без|не|нет|кроме)\b", re.IGNORECASE)
+_DIGIT = re.compile(r"\d")
+
+
+class PickChat(Protocol):
+    async def chat(
+        self, messages: list[Message], *, schema: type[BaseModel], temperature: float = 0.0
+    ) -> ChatResult: ...
+
+
+def _one_of(values: list[str]) -> Any:
+    """Тип «одно из значений списка» для схемы ответа: модель не может вывести другое."""
+    return Literal[tuple(values)]
+
+
+def _pick_schema(options: list[str]) -> type[BaseModel]:
+    """Схема ответа под этот вопрос: `value` — перечисление вариантов или null, все поля
+    обязательны. Сервер модели выводит ответ строго по схеме, поэтому значение не из списка и
+    оборванный JSON невозможны (маленькая модель закрывала строку типографской кавычкой, и верный
+    ответ «От сети”, » отбрасывался как чужой)."""
+    return create_model(
+        OptionPick.__name__,
+        quote=(str, ...),
+        value=(_one_of(options) | None, ...),
+        reason=(str, ...),
+    )
+
+
+async def pick_option(
+    name: str, description: str, characteristic: str, options: list[str], llm: PickChat
+) -> OptionChoice | None:
+    """Какой вариант вопроса сужения называет текст поставщика — или None.
+
+    Модель читает смысл («аккумуляторная» — «От аккумуляторных батарей»), код проверяет остальное:
+    значение — ровно из вариантов, цитата дословно есть в тексте, она короткая, перед ней и в ней
+    нет отрицания. Варианты с числами («>=500 ... <750») модель не выбирает: число с единицей читают
+    и пересчитывают правила. LLMError (нет связи) — наружу."""
+    if len(options) < 2 or any(_DIGIT.search(o) for o in options):
+        return None
+    user = (
+        f"Характеристика: {characteristic}\nЗначения:\n"
+        + "\n".join(f"- {o}" for o in options)
+        + f"\n\nТекст поставщика:\nНаименование: {name}\nОписание: {description or '(нет)'}"
+    )
+    messages: list[Message] = [
+        {"role": "system", "content": PICK_SYSTEM},
+        {"role": "user", "content": user},
+    ]
+    schema = _pick_schema(options)
+    reply: BaseModel | None = None
+    for attempt in (1, 2):
+        try:
+            result = await llm.chat(messages, schema=schema)
+        except LLMOutputError as exc:
+            log.warning("ответ модели о варианте не прошёл схему (попытка %d): %s", attempt, exc)
+            continue
+        reply = result.parsed if isinstance(result.parsed, BaseModel) else None
+        break
+    value, quote = getattr(reply, "value", None), getattr(reply, "quote", "") or ""
+    if value is None or value not in options:
+        return None
+    span = _locate(quote, name, description)
+    if span is None or len(span.text) > MAX_PICK_QUOTE:
+        return None  # цитаты нет в тексте или это пересказ: выбор не на чем проверить
+    before = (name if span.field == "name" else description)[: span.start]
+    if _NEGATED_BEFORE.search(before) or _NEGATION.search(span.text):
+        return None  # «без аккумулятора» — не «от аккумуляторных батарей» и не «от сети»
+    reason = (getattr(reply, "reason", "") or "").strip()[:_REASON_MAX]
+    return OptionChoice(value=value, source=span, reason=reason)
+
+
+async def suggest_option(
+    deps: ModelPolicy, name: str, description: str, characteristic: str, options: list[str]
+) -> OptionChoice | None:
+    """`pick_option` по правилам шага (`_guarded`)."""
+    return await _guarded(
+        deps,
+        lambda: pick_option(name, description, characteristic, options, deps.llm),
+        "вопрос о позиции КТРУ останется поставщику",
+    )
+
+
+ODD_SYSTEM = (
+    "Ты проверяешь карточку товара для каталога госзакупок на здравый смысл. Тебе дают тип "
+    "товара и значения характеристик, взятые из текста поставщика. Назови только те значения, "
+    "которых у такого товара быть не может: материал, из которого такой товар не делают, размер, "
+    "вес или мощность, невозможные для такого товара, значение, которое не относится к этой "
+    "характеристике. Характеристики без пометки взяты из справочника для этого товара: сами "
+    "они уместны, оценивай только значение. Характеристика с пометкой «новая» в справочнике "
+    "не значится: назови её, если она к такому товару не относится вовсе. "
+    'Отвечай только JSON по схеме {"items": [{"field", "kind", "reason"}]}.\n'
+    "field — имя характеристики ровно как в списке. kind — что не так: value — значение "
+    "невозможно для такого товара; field — сама характеристика к товару не относится (только для "
+    "характеристик с пометкой «новая»). reason — одна короткая фраза: что не так и "
+    "что обычно бывает у такого товара.\n"
+    "Обычные, редкие и просто неудачно записанные значения не называй. Сомневаешься — не "
+    "называй. Если всё правдоподобно, верни пустой список — это нормальный ответ."
+)
+MAX_ODD = 5
+_ODD_VALUES = 30
+
+
+class OddChat(Protocol):
+    async def chat(
+        self, messages: list[Message], *, schema: type[BaseModel], temperature: float = 0.0
+    ) -> ChatResult: ...
+
+
+def _odd_schema(fields: list[str]) -> type[BaseModel]:
+    """Схема ответа под эту карточку: `field` — только одно из переданных полей."""
+    item = create_model(
+        Oddity.__name__,
+        field=(_one_of(fields), ...),
+        kind=(Literal["value", "field"], ...),
+        reason=(str, ...),
+    )
+    return create_model(Oddities.__name__, items=(list[item], ...))  # type: ignore[valid-type]
+
+
+NEW_MARK = " [новая]"
+
+
+async def find_oddities(
+    product: str,
+    values: list[tuple[str, str]],
+    llm: OddChat,
+    new: frozenset[str] = frozenset(),
+) -> list[Oddity]:
+    """Значения, которых у такого товара не бывает, по мнению модели: поле — из данных, причина.
+
+    Правила видят «нет в перечне» и «вне пределов СТЕ категории», но не видят смысла: «Материал:
+    глина» у тумбочки для них — просто слово не из перечня. Ответ принимается, только если поле —
+    из переданных; это замечание поставщику (warn), значения оно не меняет. `new` — имена новых
+    характеристик (их нет в справочнике): только о них модель судит, относятся ли они к товару;
+    существование характеристики из справочника она не оспаривает. LLMError — наружу."""
+    values = values[:_ODD_VALUES]
+    if not values:
+        return []
+    user = f"Товар: {product}\nЗначения из текста поставщика:\n" + "\n".join(
+        f"- {field}: {value}{NEW_MARK if field in new else ''}" for field, value in values
+    )
+    messages: list[Message] = [
+        {"role": "system", "content": ODD_SYSTEM},
+        {"role": "user", "content": user},
+    ]
+    schema = _odd_schema([field for field, _ in values])
+    reply: BaseModel | None = None
+    for attempt in (1, 2):
+        try:
+            result = await llm.chat(messages, schema=schema)
+        except LLMOutputError as exc:
+            log.warning(
+                "ответ модели о здравом смысле не прошёл схему (попытка %d): %s", attempt, exc
+            )
+            continue
+        reply = result.parsed if isinstance(result.parsed, BaseModel) else None
+        break
+    if reply is None:
+        return []
+    known = {fold(field): field for field, _ in values}
+    out: dict[str, Oddity] = {}
+    for item in getattr(reply, "items", []):
+        field = known.get(fold(item.field))
+        reason = item.reason.strip()[:_REASON_MAX]
+        kind: Literal["value", "field"] = (
+            "field" if getattr(item, "kind", "value") == "field" else "value"
+        )
+        # Справочник важнее модели: характеристику из него модель не отменяет, только значение.
+        # У новой характеристики — наоборот: решается, заводить ли её, значение проверит модератор.
+        if field is None or (kind == "field") != (field in new):
+            continue
+        if reason and field not in out:
+            out[field] = Oddity(field=field, kind=kind, reason=reason)
+    return list(out.values())[:MAX_ODD]
+
+
+async def suggest_oddities(
+    deps: ModelPolicy,
+    product: str,
+    values: list[tuple[str, str]],
+    new: frozenset[str] = frozenset(),
+) -> list[Oddity]:
+    """`find_oddities` по правилам шага (`_guarded`)."""
+    found = await _guarded(
+        deps,
+        lambda: find_oddities(product, values, deps.llm, new),
+        "проверки значений на здравый смысл нет",
+    )
+    return found or []
 
 
 def _lost_minus(quote: str, value: str) -> bool:

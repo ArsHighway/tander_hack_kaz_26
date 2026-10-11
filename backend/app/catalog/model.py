@@ -15,6 +15,7 @@ class NumRange(BaseModel):
     max: float | None = None
 
 
+_PLAIN_NUMBER = re.compile(r"-?\d+(?:[.,]\d+)?")
 _PER_SQUARE_METRE = re.compile(r"1\s*(?:кв\.?\s*)?м\s*[²2]|квадратн\w*\s+метр", re.IGNORECASE)
 
 
@@ -47,6 +48,17 @@ class CharacteristicSpec(BaseModel):
         # его не пишет почти ни одна СТЕ. Обязательным оно делало карточку «нужно исправить».
         if self.level_define and self.kind == "qualitative" and not self.values:
             self.required = False
+        return self
+
+    @model_validator(mode="after")
+    def _numbers_with_a_unit_are_quantitative(self) -> "CharacteristicSpec":
+        # Шаблон портала хранит «Вес» (кг; «0.3», «0.4», …) как качественную характеристику с
+        # перечнем. Качественное значение правила режут по точке как по концу предложения:
+        # «Вес: 0.5 кг» давало «0», «1010.00000 г» — «1010» без единицы. Единица и числовой
+        # перечень — это величина: её читают и пересчитывают как число.
+        numbers = all(_PLAIN_NUMBER.fullmatch(v.strip()) for v in self.values)
+        if self.kind == "qualitative" and self.unit and numbers:
+            self.kind = "quantitative"
         return self
 
     @model_validator(mode="after")

@@ -8,7 +8,7 @@ import asyncio
 import logging
 import re
 import time
-from collections.abc import Awaitable, Callable
+from collections.abc import Awaitable, Callable, Iterable
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, Literal, Protocol
@@ -26,7 +26,7 @@ from app.card_fill import (
     _union_specs,
 )
 from app.catalog import Catalog, CharacteristicSpec, Position
-from app.catalog.ktru_meta import KtruMerge, merge_same
+from app.catalog.ktru_meta import KtruMerge, drop_wider, merge_same, prefer_refined
 from app.catalog.ktru_types import TYPE_SOURCE
 from app.catalog.model import GENERAL_NAMES
 from app.checks.detector import (
@@ -42,15 +42,25 @@ from app.checks.detector import (
     verdict,
 )
 from app.checks.injection import instruction_issue, strip_instructions
-from app.checks.typos import layout_fix, layout_issues, typo_issues
-from app.extract import Extracted, LLMItems, extract_llm, extract_rules
+from app.checks.typos import layout_fix, layout_issues, typo_issues, unglue
+from app.extract import Extracted, extract_llm, extract_rules
 from app.extract.extra import PortalNames
-from app.extract.llm_fill import suggest_list_value, suggest_type_order
-from app.extract.llm_review import Suggestion, apply_review, review
+from app.extract.llm_fill import (
+    _guarded,
+    suggest_list_value,
+    suggest_oddities,
+    suggest_option,
+    suggest_type_order,
+)
+from app.extract.llm_pairs import split_pairs, structured_text
+from app.extract.llm_review import Suggestion, _shares_stem, apply_review, review
+from app.extract.llm_sanity import SANITY_RULE, sanity, sanity_issues
+from app.extract.model import Oddity
 from app.extract.new_names import load_new_names, remember_new_names
 from app.extract.title import CUES, derive_parts
 from app.extract.unread import unread
 from app.glossary import Glossary
+from app.ingest.characteristics import to_number
 from app.ingest.units import normalize_unit
 from app.llm import ChatResult, LLMError, LLMInputError, LLMOutputError, Message
 from app.narrowing import (
@@ -63,10 +73,12 @@ from app.narrowing import (
     Known,
     KtruState,
     NearPosition,
+    Question,
     TrailStep,
     build_state,
     compatible,
     confirm_question,
+    narrow,
     not_found_steps,
     not_goods_steps,
     unit_label,
@@ -108,7 +120,7 @@ KTRU_CODE = re.compile(r"^\d{2}\.\d{2}\.\d{2}\.\d{3}-\d{5}(?:\d{3})?$")
 
 class ModuleLLM(Protocol):
     async def chat(
-        self, messages: list[Message], *, schema: type[LLMItems], temperature: float = 0.0
+        self, messages: list[Message], *, schema: type[BaseModel], temperature: float = 0.0
     ) -> ChatResult: ...
 
     async def embed(self, texts: list[str]) -> list[list[float]]: ...
@@ -149,6 +161,12 @@ class Deps:
     llm_enabled: bool = True
     # Модель ставит первым самый вероятный тип в вопросе «какой это товар» (`LLM_RERANK_TYPES`).
     rerank_types: bool = False
+    # Модель отвечает по тексту на вопрос сужения до позиции КТРУ (`LLM_PICK_OPTIONS`) и называет
+    # значения, которых у такого товара не бывает (`LLM_SANITY`).
+    pick_options: bool = False
+    sanity: bool = False
+    # Первым шагом модель делит текст на пары «название: значение» (`LLM_STRUCTURE`).
+    structure: bool = False
     # Второй слой модели (`extract.llm_review`) и сколько его ждать; None — выключен.
     review_llm: Any = None
     review_budget_s: float = 12.0
@@ -289,12 +307,13 @@ def _known_from_text(extracted: list[Extracted], positions: list[Position]) -> d
 
     Значение, которое не подходит ни одной позиции («Белизна 98 %» при диапазоне 146–175), —
     конфликт в карточке, а не повод выбрать позицию без этой характеристики. Значения от модели
-    только предлагаются в карточку: код КТРУ по ним не выбирается.
+    только предлагаются в карточку: код КТРУ по ним не выбирается. Исключение — ответ модели на
+    вопрос сужения (`Extracted.picks`): вариант из списка с цитатой из текста, с пометкой.
     """
     known: dict[str, Known] = {}
     left = positions
     for e in extracted:
-        if e.method != "rule":
+        if e.method != "rule" and not e.picks:
             continue
         k = Known(value=e.raw_value, unit=e.raw_unit, source="text")
         # Подходит — только к характеристике с перечнем или диапазоном: поле свободного текста
@@ -305,11 +324,288 @@ def _known_from_text(extracted: list[Extracted], positions: list[Position]) -> d
             and fit_value(k.value, k.unit, spec).status in ("exact", "normalized", "bucket", "typo")
             for p in left
         )
+        if not fits_some and (mapped := _stem_option(e.raw_value, e.name, left)) is not None:
+            k, fits_some = Known(value=mapped, source="text"), True
         narrowed = [p for p in left if compatible(p, {e.name: k})]
         if fits_some and narrowed:
             known[e.name] = k
             left = narrowed
     return known
+
+
+def _said_not_listed(
+    chars: list[CharacteristicOut], specs: list[CharacteristicSpec]
+) -> list[Issue]:
+    """Пустое поле с перечнем, о котором текст говорит в другом поле: «Материал: глина» при
+    «Вид материала корпуса: Массив дерева, МДФ, ДСП, ЛДСП». Раньше поле писало «в описании не
+    нашли», хотя материал в тексте есть — просто не из перечня. Теперь поставщик видит, что
+    именно сказано и что допустимо."""
+    empty = {
+        c.name
+        for c in chars
+        if c.value is None
+        and (spec := _spec_of(specs, c.name)) is not None
+        and spec.values
+        and spec.required  # необязательных «Вид материала …» много: замечание на каждое — шум
+    }
+    said = [c for c in chars if c.value and c.method == "rule" and c.source is not None]
+    out: list[Issue] = []
+    for name in sorted(empty):
+        spec = _spec_of(specs, name)
+        assert spec is not None
+        for c in said:
+            if fold(c.name) == fold(name) or not _label_within(c.name, name):
+                continue
+            if fit_value(c.value or "", c.unit, spec).status in ("exact", "normalized", "typo"):
+                continue
+            allowed = ", ".join(spec.values[:8])
+            quote = c.source.text if c.source else c.value
+            out.append(
+                Issue(
+                    field=f"characteristics.{name}",
+                    kind="not_in_list",
+                    severity="warn",
+                    message=(
+                        f"В описании «{quote}» ({c.name}), но в перечне КТРУ для «{name}» "
+                        f"такого значения нет: {allowed}. Выберите подходящее или исправьте "
+                        "описание."
+                    ),
+                    why="Текст называет значение, которого нет среди допустимых в позиции КТРУ.",
+                    rule="ktru.not_in_list",
+                )
+            )
+            break
+    return out
+
+
+def _label_within(short: str, long: str) -> bool:
+    """Все слова подписи «Материал» есть в «Вид материала корпуса» (по основе)."""
+    words = [w for w in tokens(short) if len(w) >= 4]
+    return bool(words) and all(_shares_stem(w, long) for w in words)
+
+
+_SPREAD_LIMIT = 2
+_NOT_SUBJECT = set(tokens("вид тип наличие количество требования значение характеристика"))
+
+
+def _one_span_few_fields(
+    chars: list[CharacteristicOut], session: Session
+) -> list[CharacteristicOut]:
+    """Одно слово текста — не в десяток полей. «материал ЛДСП» ложилось во все «Вид материала …»,
+    «Материал кромки» и «Требования к товару»: перечни у них общие, а правила разных этапов
+    (категория, КТРУ) не видят друг друга. Если фрагмент занял больше двух полей, остаются поля,
+    чьё имя лучше всех совпало со словами вокруг фрагмента; при ничьей среди многих — обязательные
+    и поле с именем ровно из этих слов («Материал»). Остальные пусты: поставщик заполнит сам."""
+    texts = {"name": session.name, "description": session.description}
+    groups: dict[tuple[str, int, int], list[CharacteristicOut]] = {}
+    for c in chars:
+        if c.method == "rule" and c.source is not None and c.value:
+            groups.setdefault((c.source.field, c.source.start, c.source.end), []).append(c)
+    drop: set[str] = set()
+    for (where, start, end), items in groups.items():
+        if len(items) <= _SPREAD_LIMIT:
+            continue
+        text = texts.get(where, "")
+        left = re.split(r"[,;\n.|]", text[:start])[-1]
+        right = re.split(r"[,;\n.|]", text[end:])[0]
+        around = set(tokens(f"{left} {right}"))
+
+        def score(c: CharacteristicOut, around: set[str] = around) -> int:
+            return len((set(tokens(c.name)) - _NOT_SUBJECT) & around)
+
+        best = max(score(c) for c in items)
+        keep = [c for c in items if score(c) == best]
+        if len(keep) > _SPREAD_LIMIT:
+            whole = [c for c in keep if set(tokens(c.name)) <= around]
+            keep = [c for c in keep if c.required] + whole or keep[:1]
+        drop |= {c.name for c in items} - {c.name for c in keep}
+    return [
+        c.model_copy(
+            update={
+                "value": None,
+                "source": None,
+                "normalized_from": None,
+                "status": "not_found",
+                "method": None,
+                "note": None,
+                "compact": None,
+                "ktru_fit": None,
+            }
+        )
+        if c.name in drop
+        else c
+        for c in chars
+    ]
+
+
+def _specs_for(target: Position, chain: "Chain | None", deps: Deps) -> list[CharacteristicSpec]:
+    """Характеристики итоговой позиции КТРУ (если есть) и выбранной категории."""
+    code = chain.ktru.final_code if chain is not None and chain.ktru else None
+    own = deps.ktru.get(code) if deps.ktru is not None and code else None
+    return [*(own.characteristics if own else []), *target.characteristics]
+
+
+KIN_NOTE = "Взято из «{name}» в тексте — проверьте"
+_KIN_SKIP = set(tokens("значение характеристика"))
+
+
+def _kin_words(name: str) -> set[str]:
+    return {w for w in tokens(name) if len(w) >= 4} - _KIN_SKIP - _NOT_SUBJECT
+
+
+def _from_kin_fields(
+    chars: list[CharacteristicOut],
+    extra: list[CharacteristicOut],
+    specs: list[CharacteristicSpec],
+) -> list[CharacteristicOut]:
+    """Обязательное поле пусто, а текст назвал то же другой подписью: «Максимальные обороты на 2ой
+    скорости 1300 об/мин» при «Максимальное количество оборотов». Все слова имени пустого поля есть
+    в подписи (по основе), значение подходит полю — ставим из текста с пометкой. Подходящих подписей
+    несколько — у «Максимального …» берём наибольшее число, иначе не угадываем."""
+    filled = [
+        c for c in [*chars, *extra] if c.value and c.method == "rule" and c.source is not None
+    ]
+    out: list[CharacteristicOut] = []
+    for c in chars:
+        spec = _spec_of(specs, c.name) if c.value is None and c.required else None
+        words = _kin_words(c.name)
+        if spec is None or not words:
+            out.append(c)
+            continue
+        kin = []
+        for f in filled:
+            if fold(f.name) == fold(c.name):
+                continue
+            if not all(_shares_stem(w, f.name) for w in words):
+                continue
+            fit = fit_value(f.value or "", f.unit, spec)
+            if fit.status in ("exact", "normalized", "bucket"):
+                kin.append((f, fit))
+        numbers = [to_number(f.value or "") for f, _ in kin]
+        if len(kin) > 1 and c.name.casefold().startswith("максимальн") and None not in numbers:
+            kin = [max(kin, key=lambda k: to_number(k[0].value or "") or 0.0)]
+        if len(kin) != 1:
+            out.append(c)
+            continue
+        f, fit = kin[0]
+        out.append(
+            c.model_copy(
+                update={
+                    "value": fit.value if fit.value is not None else f.value,
+                    "unit": fit.unit or spec.unit or f.unit,
+                    "source": f.source,
+                    "status": "filled",
+                    "method": "rule",
+                    "note": KIN_NOTE.format(name=f.name),
+                }
+            )
+        )
+    return out
+
+
+def _spec_of(specs: list[CharacteristicSpec], name: str) -> CharacteristicSpec | None:
+    return next((c for c in specs if fold(c.name) == fold(name)), None)
+
+
+_NEGATION = {"не", "без", "нет"}
+_AFTER_LABEL = re.compile(r"\s*:?\s*([^|;\n.]{1,60})")
+
+
+def _known_from_labels(
+    text: str, positions: list[Position], known: dict[str, Known]
+) -> dict[str, Known]:
+    """«Тип питания Сменный аккумулятор» — подпись характеристики и слово не из перечня: правила
+    его не берут, и поставщика спрашивали «От сети или от аккумуляторных батарей?» при ответе в
+    тексте. Слово после подписи с основой ровно одного варианта сужает, как значение из текста."""
+    low = text.casefold()
+    out: dict[str, Known] = {}
+    left = narrow(positions, known)
+    names = {c.name for p in left for c in p.characteristics if c.values}
+    for name in sorted(names, key=len, reverse=True):
+        if name in known:
+            continue
+        for m in re.finditer(r"(?<!\w)" + re.escape(name.casefold()) + r"(?!\w)", low):
+            said = _AFTER_LABEL.match(text, m.end())
+            mapped = _stem_option(said[1], name, left) if said else None
+            if mapped is None:
+                continue
+            k = Known(value=mapped, source="text")
+            narrowed = narrow(left, {name: k})
+            if narrowed:
+                out[name], left = k, narrowed
+            break
+    return out
+
+
+def _stem_option(raw: str, name: str, positions: list[Position]) -> str | None:
+    """Слово поставщика не из перечня, но с той же основой у ровно одного варианта: «Сменный
+    аккумулятор» при «От сети / От аккумуляторных батарей» — второй. «Без аккумулятора» и два
+    варианта с той же основой — не выбор."""
+    words = tokens(raw)
+    if not words or _NEGATION & set(words):
+        return None
+    options = {
+        v
+        for p in positions
+        if (spec := next((c for c in p.characteristics if fold(c.name) == fold(name)), None))
+        for v in spec.values
+    }
+    return _stem_pick(raw, options)
+
+
+def _stem_pick(raw: str, options: Iterable[str]) -> str | None:
+    words = tokens(raw)
+    if not words or _NEGATION & set(words):
+        return None
+    hits = [v for v in set(options) if _shares_stem(raw, v)]
+    return hits[0] if len(hits) == 1 else None
+
+
+LABEL_NOTE = "По подписи в тексте «{said}» — вариант перечня с той же основой, проверьте"
+
+
+def _from_labels(
+    chars: list[CharacteristicOut], session: Session, specs: list[CharacteristicSpec]
+) -> list[CharacteristicOut]:
+    """Пустое поле с перечнем, подпись которого есть в тексте, а слово после неё — основой ровно
+    одного варианта: «Тип питания Сменный аккумулятор» → «От аккумуляторных батарей». Тем же
+    правилом текст уже сузил позицию КТРУ (`_known_from_labels`); теперь и поле не пусто."""
+    texts: dict[Literal["name", "description"], str] = {
+        "name": session.name,
+        "description": session.description,
+    }
+    out: list[CharacteristicOut] = []
+    for c in chars:
+        spec = _spec_of(specs, c.name) if c.value is None else None
+        if spec is None or not spec.values:
+            out.append(c)
+            continue
+        filled = None
+        for where, text in texts.items():
+            for m in re.finditer(
+                r"(?<!\w)" + re.escape(c.name.casefold()) + r"(?!\w)", text.casefold()
+            ):
+                said = _AFTER_LABEL.match(text, m.end())
+                value = _stem_pick(said[1], spec.values) if said else None
+                if value is None or said is None:
+                    continue
+                phrase = said[1].strip()
+                at = text.index(phrase, m.end())
+                filled = c.model_copy(
+                    update={
+                        "value": value,
+                        "source": Span(field=where, start=at, end=at + len(phrase), text=phrase),
+                        "status": "normalized",
+                        "normalized_from": phrase,
+                        "method": "rule",
+                        "note": LABEL_NOTE.format(said=phrase),
+                    }
+                )
+                break
+            if filled is not None:
+                break
+        out.append(filled or c)
+    return out
 
 
 def _target(state: KtruState, catalog: Catalog) -> Position | None:
@@ -376,6 +672,7 @@ def render(session: Session, deps: Deps) -> AutofillOut:
     state = _state(session, deps)
     positions = [p for c in session.candidates if (p := deps.catalog.get(c.code)) is not None]
     state.trail = _first_trail(state, positions, session, deps)
+    _mark_picks(state.trail, [e for e in session.extracted if e.picks])
     state.candidates = _explained(
         state.candidates, deps.catalog.get, session.extracted, session.known
     )
@@ -407,6 +704,17 @@ def render(session: Session, deps: Deps) -> AutofillOut:
     extra: list[CharacteristicOut] = []
     if target is not None:
         chars, extra = _origins(session, target, chars, chain, answered, deps)
+        # Новая характеристика заводится, только если по смыслу относится к товару: ту, которую
+        # модель назвала чужой, не заводим — её текст остаётся в «Не разобрано».
+        alien = (
+            {fold(o.field) for o in session.oddities if o.kind == "field"}
+            if target.code == session.llm_for
+            else set()
+        )
+        extra = [e for e in extra if e.origin != "new" or fold(e.name) not in alien]
+        chars = _one_span_few_fields(chars, session)
+        chars = _from_kin_fields(chars, extra, _specs_for(target, chain, deps))
+        chars = _from_labels(chars, session, _specs_for(target, chain, deps))
     if target is not None:
         issues = _issues(session, target, chars)
         if (dup := _duplicate(session.twins, target.code)) is not None:
@@ -426,6 +734,14 @@ def render(session: Session, deps: Deps) -> AutofillOut:
         issues.insert(0, instruction_issue(session.injected))
     if chain is not None:
         issues.extend(_merge_issue(m) for m in chain.ktru_merged)
+    if target is not None:
+        # Код уже сказал о поле («ноль — так не бывает», «необычно для категории»): мнение модели
+        # о том же поле — повтор.
+        flagged = {i.field for i in issues if i.severity != "info" and i.kind == "mismatch"}
+        issues.extend(
+            i for i in session.sanity if i.field == "description" or i.field not in flagged
+        )
+        issues.extend(_said_not_listed([*chars, *extra], _specs_for(target, chain, deps)))
     kind = None
     if state.steps == [STEP_NOT_FOUND]:
         kind = outside_kind(deps.glossary.expand(session.name), deps.exemplars)
@@ -445,6 +761,8 @@ def render(session: Session, deps: Deps) -> AutofillOut:
     # общее «так не бывает» не повторяем.
     flagged = {i.field for i in issues if i.severity != "info" and i.rule != SIZE_RULE}
     issues = [i for i in issues if i.rule != SIZE_RULE or i.field not in flagged]
+    if target is not None and target.code == session.llm_for:
+        issues.extend(_oddity_issues(session, target, chars, issues))
     # Одно и то же замечание дважды («Похоже на опечатку: «Шырина»» из наименования и проверки
     # описания) — один раз.
     issues = list({(i.field, i.message): i for i in reversed(issues)}.values())[::-1]
@@ -711,6 +1029,11 @@ def _chain(session: Session, code: str | None, deps: Deps) -> Chain | None:
         # Значение, найденное в поле шаблона категории («Класс одежды…: 2 класс»), сужает и КТРУ,
         # даже если перечень КТРУ записан иначе («2»): решённое модулем не спрашивается.
         extracted += _template_for_ktru(session.extracted, extracted, ktru_specs)
+        # Ответ модели на вопрос сужения по тексту («аккумуляторная» → «От аккумуляторных
+        # батарей», `_answer_from_text`): правила этого слова не взяли, а позицию оно выбирает.
+        have = {fold(e.name) for e in extracted}
+        picked = [e for e in session.extracted if e.picks and fold(e.name) not in have]
+        extracted += picked
         # Ответы первого этапа («Цветность: Белая» при выборе категории) сужают и КТРУ: тот же
         # вопрос второй раз не задаётся. Ответы второго этапа важнее.
         ktru_names = {fold(c.name) for p in ktru_positions for c in p.characteristics}
@@ -722,6 +1045,22 @@ def _chain(session: Session, code: str | None, deps: Deps) -> Chain | None:
             and fold(name) in ktru_names
         }
         known = {**_known_from_text(extracted, ktru_positions), **answered, **session.ktru_known}
+        text = f"{session.name}\n{session.description}"
+        known = {**_known_from_labels(text, ktru_positions, known), **known}
+        named = {fold(n) for n, k in known.items() if k.value not in (NONE_VALUE, OTHER_VALUE)}
+        _, refined = prefer_refined(narrow(ktru_positions, known), named)
+        if refined:
+            gone = {code for m in refined for code in m.dropped}
+            ktru_positions = [p for p in ktru_positions if p.code not in gone]
+            merged = [*merged, *refined]
+        # Общая позиция (шаблон КТРУ со всеми вариантами) рядом с точной из него: на «от
+        # аккумулятора» подходят обе, и поставщик выбирал из двух одинаковых. Пока точная
+        # подходит, общая не предлагается; подтверждённую поставщиком не прячем.
+        narrowed, wider = drop_wider(ktru_positions, lambda p: compatible(p, known))
+        if session.ktru_confirmed in wider:
+            wider = {}
+        else:
+            ktru_positions = narrowed
         candidates = [
             Candidate(code=p.code, name=p.name, score=0.0, why=[]) for p in ktru_positions
         ]
@@ -761,13 +1100,34 @@ def _chain(session: Session, code: str | None, deps: Deps) -> Chain | None:
             state.trail.insert(
                 1,
                 TrailStep(
-                    label="Одинаковые позиции объединены, осталась более свежая: "
+                    label=(
+                        "Одинаковые позиции и шаблоны объединены, осталась более точная или "
+                        "свежая: "
+                        if refined
+                        else "Одинаковые позиции объединены, осталась более свежая: "
+                    )
                     + ", ".join(m.kept for m in merged),
+                    remaining=len(ktru_positions),
+                ),
+            )
+        if wider:
+            state.trail.insert(
+                1 + bool(merged),
+                TrailStep(
+                    label="Общая позиция со всеми вариантами (шаблон КТРУ) не предлагается, пока "
+                    "подходит более точная: " + ", ".join(wider),
                     remaining=len(ktru_positions),
                 ),
             )
         if state.final_code and state.trail[-1].remaining != 1:
             state.trail.append(TrailStep(label=f"Выбрана позиция {state.final_code}", remaining=1))
+        # Что выбор сделала модель, видно в воронке и в шагах. Шаги — в начало: последний шаг
+        # мастер показывает как пояснение к вопросу.
+        used = [e for e in picked if (k := known.get(e.name)) is not None and k.source == "text"]
+        _mark_picks(state.trail, used)
+        state.steps[0:0] = [
+            PICKED_STEP.format(name=e.name, value=e.raw_value, quote=e.source.text) for e in used
+        ]
     return Chain(
         category=position.code,
         category_name=position.name,
@@ -909,6 +1269,9 @@ async def prepare_session(inp: AutofillIn, deps: Deps) -> Session:
     description, _ = layout_fix(inp.description, deps.bm25)
     typed = (("name", inp.name, name), ("description", inp.description, description))
     layout = {field: was for field, was, now in typed if was != now}
+    # «столдеревянный» — пропущен пробел: ищем и читаем по «стол деревянный», о замене — замечание.
+    name, glued = unglue(name, deps.bm25, deps.exemplars)
+    description, _ = unglue(description, deps.bm25, deps.exemplars)
     typos = _name_typos(name, deps)
     for was, now in typos.items():
         name = re.sub(rf"\b{re.escape(was)}\b", now, name)
@@ -920,8 +1283,12 @@ async def prepare_session(inp: AutofillIn, deps: Deps) -> Session:
     stripped_name, injected_name = strip_instructions(name)
     if stripped_name:
         name, injected = stripped_name, [*injected_name, *injected]
+    if deps.structure:
+        # Первый шаг: модель делит текст на пары «название: значение» (`extract.llm_pairs`),
+        # дальше строки «Название: значение» раскладывает код — КТРУ, портал, новая характеристика.
+        description = await _structured(name, description, deps)
     session = Session.new(name=name, description=description)
-    session.layout, session.typos = layout, typos
+    session.layout, session.typos = layout, {**glued, **typos}
     session.injected = injected
     query = deps.glossary.expand(f"{name}\n{description}")
     embed = (
@@ -968,13 +1335,27 @@ async def prepare_session(inp: AutofillIn, deps: Deps) -> Session:
     session.weak_match = weak
     # Модель — только о характеристиках определённой позиции: пока код не определён, вопрос по
     # объединению кандидатов стоил 5–13 с и квоты, а ответ шёл и в чужие позиции. Не определён —
-    # спросим в `answer`, когда ответ поставщика его определит.
+    # спросим в `answer`, когда ответ поставщика его определит. Вопрос сужения о характеристике —
+    # другое дело: вариантов мало, и если текст на него отвечает, поставщика не спрашиваем.
+    await _answer_from_text(session, None, deps)
     state = _state(session, deps)
     if state.final_code is not None:
         await _fill_missing(session, state.final_code, deps)
     elif deps.rerank_types and state.question is not None:
         await _rank_types(session, state, deps)
     return session
+
+
+async def _structured(name: str, description: str, deps: Deps) -> str:
+    """Описание, приведённое моделью к строкам «Название: значение» (`split_pairs`): пару код
+    принимает, только если цитата есть в тексте, а значение — в цитате; непринятое и неразобранное
+    остаётся как было. Модель выключена, на паузе или не успела — описание без изменений."""
+    pairs = await _guarded(
+        deps,
+        lambda: split_pairs(name, description, deps.llm),
+        "текст разбирают только правила",
+    )
+    return structured_text(description, pairs or [])
 
 
 async def _rank_types(session: Session, state: KtruState, deps: Deps) -> None:
@@ -1114,7 +1495,8 @@ def _typo_issue(session: Session) -> Issue:
         kind="typo",
         severity="warn",
         message=f"Похоже на опечатку: {fixed}. Товар подобран по исправленному наименованию.",
-        why="Такого слова нет в наименованиях КТРУ, а на одну букву от него — одно слово.",
+        why="Такого слова нет в справочнике: на одну букву от него — одно слово, или это два "
+        "слова без пробела.",
         rule="наименование без опечаток",
         fix=Fix(name="name", value=session.name),
     )
@@ -1226,12 +1608,13 @@ async def _fill_missing(session: Session, code: str, deps: Deps) -> None:
     if position is None:
         return
     # Значения модели прежней позиции — вон, приведённые моделью к перечню — обратно как в тексте.
+    # Ответ модели на вопрос сужения остаётся: по нему выбрана сама позиция.
     kept = [
         e.model_copy(update={"raw_value": e.was, "method": "rule", "was": None, "note": None})
         if e.was is not None
         else e
         for e in session.extracted
-        if e.method != "llm" or e.was is not None
+        if e.method != "llm" or e.was is not None or e.picks
     ]
     session.extracted = kept
     # Что поставщик уже сказал ответом, модель и подсказки не переспрашивают.
@@ -1250,7 +1633,12 @@ async def _fill_missing(session: Session, code: str, deps: Deps) -> None:
         _match_lists(session, kept, position, deps),
     )
     session.extracted = [*kept, *items]
-    await _review(session, position, deps)
+    _, _, session.oddities = await asyncio.gather(
+        _review(session, position, deps),
+        _sanity(session, position, deps),
+        _oddities(session, position, deps),
+    )
+    await _answer_from_text(session, code, deps)
     read = {fold(e.name) for e in items}
     session.twin_hints = {n: h for n, h in twin.items() if fold(n) not in read}
     taken = answered | {fold(n) for n in session.twin_hints}
@@ -1286,6 +1674,188 @@ async def _review(session: Session, position: Position, deps: Deps) -> None:
         )
 
 
+MAX_PICKS = 3
+PICKED_NOTE = "Модель выбрала по тексту «{quote}» — проверьте"
+PICKED_STEP = (
+    "Позицию КТРУ помогла выбрать модель: «{name}» — «{value}» по тексту «{quote}». Проверьте."
+)
+PICKED_TRAIL = " — модель по тексту «{quote}»"
+
+
+def _mark_picks(trail: list[TrailStep], picked: list[Extracted]) -> None:
+    """Шаг воронки, который сделал ответ модели, так и подписан: «Тип питания: От аккумуляторных
+    батарей — модель по тексту «аккумуляторная»»."""
+    quotes = {f"{e.name}: {e.raw_value}": e.source.text for e in picked}
+    for step in trail:
+        if (quote := quotes.get(step.label)) is not None:
+            step.label += PICKED_TRAIL.format(quote=quote)
+
+
+def _open_question(session: Session, code: str | None, deps: Deps) -> Question | None:
+    """Вопрос, который сейчас получил бы поставщик: первого этапа (`code` нет) или второго."""
+    if code is None:
+        return _state(session, deps).question
+    chain = _chain(session, code, deps)
+    return chain.ktru.question if chain is not None and chain.ktru is not None else None
+
+
+async def _answer_from_text(session: Session, code: str | None, deps: Deps) -> bool:
+    """Вопрос сужения, на который отвечает сам текст, поставщику не задаётся — на любом этапе:
+    о характеристике при выборе категории (`code` нет) и при выборе позиции КТРУ внутри типа.
+
+    Правила берут значение, только если оно записано словами перечня; текст же часто называет
+    его иначе — признаком в наименовании, синонимом. Модель называет вариант и цитату
+    (`pick_option`), код проверяет и сужает дальше — не больше `MAX_PICKS` вопросов подряд.
+    Значение — в поле с пометкой «проверьте», в шагах сказано, что выбор сделала модель. Вопрос
+    «какой это товар» (`CONFIRM`) модель не решает — только ставит вероятный тип первым
+    (`_rank_types`). True — что-то выбрано."""
+    asked: set[str] = set()
+    changed = False
+    started = time.monotonic()
+    for _ in range(MAX_PICKS if deps.pick_options else 0):
+        q = _open_question(session, code, deps)
+        if q is None or q.characteristic in (CONFIRM, UNIT_QUESTION) or q.characteristic in asked:
+            break
+        if deps.llm_budget_s is not None and time.monotonic() - started > deps.llm_budget_s:
+            break  # все вопросы подряд — не дольше одного бюджета модели: шаг мастера ждёт
+        asked.add(q.characteristic)
+        options = [
+            o.value for o in q.options if o.value not in (NONE_VALUE, OTHER_VALUE, NOTHING_FITS)
+        ]
+        name = fold(q.characteristic)
+        # Первая модель уже прочла это поле с цитатой («Тип питания = От сети»): второй вопрос
+        # не нужен, её значение из вариантов и выбирает позицию.
+        own = next(
+            (
+                e
+                for e in session.extracted
+                if fold(e.name) == name and e.method == "llm" and e.raw_value in options
+            ),
+            None,
+        )
+        if own is not None:
+            pick = own.model_copy(update={"picks": True})
+        else:
+            hit = await suggest_option(
+                deps, session.name, session.description, q.characteristic, options
+            )
+            if hit is None:
+                break
+            pick = Extracted(
+                name=q.characteristic,
+                raw_value=hit.value,
+                source=hit.source,
+                method="llm",
+                note=PICKED_NOTE.format(quote=hit.source.text),
+                picks=True,
+            )
+        session.extracted = [*(e for e in session.extracted if fold(e.name) != name), pick]
+        changed = True
+        if code is None:
+            session.known = {**_text_known(session, deps), **_answered(session)}
+    return changed
+
+
+def _answered(session: Session) -> dict[str, Known]:
+    return {n: k for n, k in session.known.items() if k.source == "answer"}
+
+
+def _text_known(session: Session, deps: Deps) -> dict[str, Known]:
+    """Значения из текста, сужающие первый этап (правила и ответы модели на вопрос сужения)."""
+    positions = [p for c in session.candidates if (p := deps.catalog.get(c.code)) is not None]
+    return _known_from_text(session.extracted, positions)
+
+
+async def _oddities(session: Session, position: Position, deps: Deps) -> list[Oddity]:
+    """Значения из текста, которых у такого товара не бывает («Материал: глина» у тумбочки), по
+    мнению модели (`find_oddities`) — замечание поставщику, значения не меняются.
+
+    Проверяется карточка, какой её увидит поставщик: все поля со значением из текста, включая
+    характеристики позиций КТРУ, которых нет в шаблоне типа («Материал изделия»)."""
+    if not deps.sanity:
+        return []
+    card = render(session, deps)
+    # Новые характеристики (подписи нет ни в позиции, ни на портале) — тоже: к товару должна
+    # относиться сама характеристика, иначе она не заводится (`render`).
+    fields = [*card.characteristics, *(e for e in card.extra if e.origin == "new")]
+    values = {
+        c.name: f"{c.value} {c.unit}" if c.unit else c.value
+        for c in fields
+        if c.value and c.method in ("rule", "llm")
+    }
+    new = frozenset(e.name for e in card.extra if e.origin == "new")
+    return await suggest_oddities(deps, position.name, list(values.items()), new)
+
+
+_FITS_CATALOG = ("in_list", "normalized", "in_range")
+
+
+def _oddity_issues(
+    session: Session, target: Position, chars: list[CharacteristicOut], issues: list[Issue]
+) -> list[Issue]:
+    """Замечания модели о здравом смысле — для полей, взятых из текста, если о поле ещё не
+    сказано «необычно» (пределы СТЕ категории, габарит): одно и то же дважды не говорим.
+
+    Данные важнее мнения модели: значение из перечня позиции и число, для которого у категории
+    есть свои пределы по СТЕ портала (`CharacteristicSpec.plausible`), модель не оспаривает —
+    она говорит только там, где у кода своей меры нет."""
+    said = {i.field for i in issues if i.severity == "warn"}
+    # О поле уже сказала проверка текста второй моделью (`llm_sanity`) — второй раз не говорим.
+    told = {i.field for i in issues if i.rule == SANITY_RULE}
+    by_name = {fold(c.name): c for c in chars}
+    specs = {fold(s.name): s for s in target.characteristics}
+    out = []
+    for o in session.oddities:
+        c = by_name.get(fold(o.field))
+        field = f"characteristics.{o.field}"
+        if c is None or c.value is None or c.method not in ("rule", "llm") or field in told:
+            continue
+        spec = specs.get(fold(o.field))
+        # О числе «необычно» уже сказали данные — модель не повторяет. О слове («глина») код
+        # говорит только «нет в перечне»: почему оно не подходит товару, добавляет модель.
+        if field in said and (spec is None or spec.kind == "quantitative"):
+            continue
+        fits = c.status != "conflict" and c.ktru_fit not in ("not_in_list", "out_of_range")
+        # Справочник сам задаёт перечень или диапазон, и значение в него укладывается.
+        listed = bool(c.values) or c.range is not None or c.ktru_fit in _FITS_CATALOG
+        allowed = fits and listed
+        if allowed or (spec is not None and spec.plausible is not None):
+            continue
+        shown = f"{c.value} {c.unit}" if c.unit else c.value
+        reason = o.reason.rstrip(" .")
+        out.append(
+            Issue(
+                field=field,
+                kind="mismatch",
+                severity="warn",
+                message=f"«{c.name}: {shown}» — необычно для товара «{target.name}»: "
+                f"{reason[:1].lower()}{reason[1:]}. Проверьте значение.",
+                why="Так считает модель: она сверяет значения из текста со здравым смыслом. "
+                "Значение не изменено — решает поставщик.",
+                rule=SANITY_RULE,
+            )
+        )
+    return out
+
+
+async def _sanity(session: Session, position: Position, deps: Deps) -> None:
+    """Проверка правдоподобия (`llm_sanity`): тумбочка из глины, тумба глубиной 100 м. Только
+    замечания `warn`; не ответила за `review_budget_s` — замечаний нет."""
+    session.sanity = []
+    if deps.review_llm is None or not deps.llm_enabled:
+        return
+    text = f"{session.name}\n{session.description}"
+    try:
+        answer = await asyncio.wait_for(
+            sanity(position.name, text, deps.review_llm), timeout=deps.review_budget_s
+        )
+    except (TimeoutError, LLMError) as exc:
+        log.warning("проверка правдоподобия не ответила: %s", type(exc).__name__)
+        return
+    if answer is not None:
+        session.sanity = sanity_issues(answer, text, session.extracted)
+
+
 MATCH_LIMIT = 6
 MATCHED_NOTE = "Модель привела «{was}» из текста к перечню КТРУ — проверьте"
 
@@ -1304,6 +1874,9 @@ async def _match_lists(
         for i, e in enumerate(extracted)
         if e.method == "rule"
         and (spec := specs.get(fold(e.name))) is not None
+        # Число к перечню приводит код (единицы, корзины), а не модель: «1010 г» при перечне
+        # «0.3, 0.4, …» она «приводила» к 0.3 кг.
+        and not e.raw_value[:1].isdigit()
         and fit_value(e.raw_value, e.raw_unit, spec).status == "not_in_list"
     ][:MATCH_LIMIT]
     if not todo:
@@ -1493,6 +2066,11 @@ async def answer(session_id: str, inp: AnswerIn, deps: Deps) -> AutofillOut:
     fresh = await deps.sessions.load(session_id)
     if fresh is None:
         raise SessionNotFound(session_id)
+    if inp.stage != "ktru" and await _answer_from_text(fresh, None, deps):
+        # Ответ снял один вопрос первого этапа — следующий модель может снять по тексту сама.
+        await deps.sessions.update(
+            session_id, extracted=fresh.extracted, known=_text_known(fresh, deps)
+        )
     final = _state(fresh, deps).final_code
     if before is not None and final != before and (fresh.ktru_known or fresh.ktru_confirmed):
         # Другой тип или категория: ответы второго этапа были о позициях КТРУ прежнего выбора
@@ -1512,7 +2090,12 @@ async def answer(session_id: str, inp: AnswerIn, deps: Deps) -> AutofillOut:
             similar_for=fresh.similar_for,
             twin_hints=fresh.twin_hints,
             suggestions=fresh.suggestions,
+            oddities=fresh.oddities,
+            sanity=fresh.sanity,
         )
+    elif final is not None and inp.stage == "ktru" and await _answer_from_text(fresh, final, deps):
+        # Ответ снял один вопрос второго этапа — следующий модель может снять по тексту сама.
+        await deps.sessions.update(session_id, extracted=fresh.extracted)
     return await _render_new_names(fresh, deps, remember=False)
 
 

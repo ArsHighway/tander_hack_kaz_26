@@ -219,3 +219,77 @@ def typo_issues(
             for issue in issues:
                 issue.fix = Fix(value=fixed_text)
     return issues
+
+
+# Слитное написание: пропущенный пробел между словами («столдеревянный» — «стол деревянный»).
+MIN_GLUED = 6
+# Короче — не слово, а обрубок: на трёх буквах «Супермен» раскладывался в «Супе рмен».
+MIN_GLUED_PART = 4
+MAX_GLUED_PARTS = 3
+_CYRILLIC_WORD = re.compile(r"(?<![\p{L}\p{N}-])[а-яё]+(?![\p{L}\p{N}-])", re.IGNORECASE)
+
+
+def _known_word(part: str, bm25: BM25Index) -> bool:
+    stems = tokens(part)
+    return len(part) >= MIN_GLUED_PART and len(stems) == 1 and bm25.knows(stems[0])
+
+
+def _split_glued(word: str, bm25: BM25Index, depth: int = MAX_GLUED_PARTS) -> list[str] | None:
+    """Слово, целиком разложенное на слова словаря справочника; None — так не раскладывается.
+
+    Из нескольких разложений берётся то, где частей меньше, а самая короткая часть длиннее:
+    «столдеревянный» — «стол» и «деревянный», а не три обрубка."""
+    best: list[str] | None = None
+    for i in range(MIN_GLUED_PART, len(word) - MIN_GLUED_PART + 1):
+        left, right = word[:i], word[i:]
+        if not _known_word(left, bm25):
+            continue
+        if _known_word(right, bm25):
+            parts: list[str] | None = [left, right]
+        else:
+            rest = _split_glued(right, bm25, depth - 1) if depth > 2 else None
+            parts = [left, *rest] if rest else None
+        if parts is None:
+            continue
+
+        def rank(p: list[str]) -> tuple[int, int]:
+            return (-len(p), min(map(len, p)))
+
+        if best is None or rank(parts) > rank(best):
+            best = parts
+    return best
+
+
+def unglue(
+    text: str, bm25: BM25Index, exemplars: ExemplarIndex | None = None
+) -> tuple[str, dict[str, str]]:
+    """Текст с разделёнными слитными словами и что на что заменено.
+
+    Делится только слово, которого нет ни в словаре справочника, ни среди слов наименований СТЕ
+    портала (составные слова — «электролобзик», «шуруповерт» — пишут слитно, и это не ошибка), и
+    только если оно без остатка раскладывается на слова справочника, которые встречаются вместе в
+    одной его позиции («стол» и «деревянный» — да, «пол» и «ночь» — нет). Бренды и модели
+    (латиница, капс, кавычки, заглавная не в начале фразы, цифры, дефис) не трогаются: без этих
+    условий на 9 тыс. строк выгрузок организаторов правило портило 178 слов («Заботливые» —
+    «Заб отливые», «Союзмебель» — «Союз мебель»)."""
+    changed: dict[str, str] = {}
+
+    def sub(m: re.Match[str]) -> str:
+        word = m[0]
+        stems = tokens(word)
+        if len(word) < MIN_GLUED or len(stems) != 1 or bm25.knows(stems[0]):
+            return word
+        if exemplars is not None and exemplars.df(stems[0]) > MAX_PORTAL_DF:
+            return word
+        if _brand_like(text, m):
+            return word
+        parts = _split_glued(word.casefold(), bm25)
+        if parts is None or not bm25.together([s for p in parts for s in tokens(p)]):
+            return word
+        fixed = " ".join(parts)
+        if word[:1].isupper():
+            fixed = fixed[:1].upper() + fixed[1:]
+        changed[word] = fixed
+        return fixed
+
+    return _CYRILLIC_WORD.sub(sub, text), changed

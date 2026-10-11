@@ -27,7 +27,13 @@ from app.checks.moderation import (
     target_char,
 )
 from app.extract.model import Extracted
-from app.extract.quantities import bare_values, negative_at, number_in_range, phrase_values
+from app.extract.quantities import (
+    bare_values,
+    identifier_like,
+    negative_at,
+    number_in_range,
+    phrase_values,
+)
 from app.glossary import Glossary
 from app.ingest.characteristics import split_name_unit
 from app.ingest.units import normalize_unit
@@ -1228,7 +1234,9 @@ def _subject(spec: CharacteristicSpec) -> tuple[str, bool] | None:
     и только прилагательное («Набор маркеров», «блок питания» — о другом)."""
     raw = [w for w in _WORD.findall(spec.name) if tokens(w)]
     if raw and tokens(raw[0])[0].startswith(_PRESENCE):
-        word = raw[1] if len(raw) > 1 else None
+        # «Наличие функции удара» — удар, а не «функции»: служебное слово предмет не называет.
+        rest = [w for w in raw[1:] if not tokens(w)[0].startswith(_PRESENCE)]
+        word = rest[0] if rest else None
     elif len(raw) > 1 and _is_adj(raw[-1]):
         word = raw[-1]
     else:
@@ -1247,6 +1255,16 @@ def _yes_no(field: Field, text: str, specs: list[CharacteristicSpec]) -> Iterato
         if found is None:
             continue
         subject, adjective = found
+        # Остальные слова имени тоже должны быть рядом: «Возможность регулировки угла наклона» —
+        # не «регулировка частоты вращения», «работы с лентой» — не любая «работа».
+        others = [
+            t[0]
+            for w in _WORD.findall(spec.name)
+            if (t := tokens(w))
+            and len(t[0]) >= MIN_SUBJECT
+            and not t[0].startswith(_PRESENCE)
+            and t[0] != subject
+        ]
         seen: dict[str, re.Match[str]] = {}
         for i, w in enumerate(words):
             stem = tokens(w[0])
@@ -1256,6 +1274,9 @@ def _yes_no(field: Field, text: str, specs: list[CharacteristicSpec]) -> Iterato
                 stem[0][2:], subject
             )  # «неавтоматическая»
             if not fused and not _same_root(stem[0], subject):
+                continue
+            near = [t[0] for x in words[max(0, i - 4) : i + 5] if (t := tokens(x[0]))]
+            if not all(any(_same_root(n, o) for n in near) for o in others):
                 continue
             after = [fold(x[0]) for x in words[i + 1 : i + 3]]
             absent = (
@@ -1523,7 +1544,67 @@ def extract_rules(
             found.setdefault(e.name, e)
     texts = {"name": name, "description": description}
     kept = [e for e in found.values() if not _distorted(e, texts.get(e.source.field, ""))]
+    kept = [e for e in kept if not _list_detail(e, description, by_name.get(e.name))]
+    kept = [e for e in kept if not _identifier(e, texts.get(e.source.field, ""))]
     return _one_field_per_span(kept, name, description)
+
+
+def _identifier(e: Extracted, text: str) -> bool:
+    """Число, взятое само по себе (без подписи и единицы в цитате), — на деле номер, порядковое
+    или часть обозначения (`identifier_like`). Проверка общая для всех правил: какое из них взяло
+    число, неважно."""
+    quote = e.source.text.strip()
+    if not e.raw_value[:1].isdigit() or not _BARE_NUMBER.fullmatch(quote):
+        return False
+    start = e.source.start + e.source.text.index(quote)
+    if text[start : start + len(quote)] != quote:
+        return False
+    return identifier_like(text, start, start + len(quote))
+
+
+_LIST_COMMA = re.compile(r",\s")
+
+
+def _names_field(spec: CharacteristicSpec, words: str) -> bool:
+    """Слова рядом с числом называют эту характеристику: общее слово с её именем или синонимом."""
+    need = {t for raw in (spec.name, *spec.synonyms) for t in tokens(raw)}
+    variants = [words, *(p.sub(canon, words) for p, canon in _LABEL_SYNONYMS if p.search(words))]
+    return any(need & set(tokens(v)) for v in variants)
+
+
+def _list_detail(e: Extracted, description: str, spec: CharacteristicSpec | None) -> bool:
+    """Число — подробность перечня под чужой подписью, а не значение этого поля.
+
+    «Комплектация Отвертка, зарядное устройство, бит-насадки (5 шт»: пять — это насадок, а не
+    «Количество предметов в комплекте». Число идёт в поле, только если текст сам связывает его с
+    полем: оно стоит в первой части фразы (после её подписи), рядом с ним слова имени
+    характеристики («2 аккумулятора» — «Количество аккумуляторов») или рядом нет других слов
+    («…, 100 шт»). Иначе фраза остаётся целой и уходит в отдельную характеристику (`extra`)."""
+    if spec is None or e.source.field != "description" or not e.raw_value[:1].isdigit():
+        return False
+    line = next(
+        (m for m in _SEGMENT.finditer(description) if m.start() <= e.source.start < m.end()), None
+    )
+    if line is None:
+        return False
+    # Фраза — предложение внутри строки: перечень не тянется через точку.
+    starts = [m.end() for m in _SENTENCE.finditer(description, line.start(), e.source.start)]
+    stop = _SENTENCE.search(description, e.source.end, line.end())
+    first, last = (starts[-1] if starts else line.start()), (stop.start() if stop else line.end())
+    before = list(_LIST_COMMA.finditer(description, first, e.source.start))
+    if not before:
+        return False
+    after = _LIST_COMMA.search(description, e.source.end, last)
+    part_end = after.start() if after else last
+    rest = (
+        description[before[-1].end() : e.source.start] + " " + description[e.source.end : part_end]
+    )
+    words = [
+        w
+        for w in _WORD.findall(rest)
+        if any(ch.isalpha() for ch in w) and normalize_unit(w) is None
+    ]
+    return bool(words) and not _names_field(spec, " ".join(words))
 
 
 def _distorted(e: Extracted, text: str) -> bool:

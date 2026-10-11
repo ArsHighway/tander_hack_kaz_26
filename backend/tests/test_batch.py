@@ -106,12 +106,11 @@ def test_too_many_rows_is_rejected() -> None:
 
 
 def test_row_failure_does_not_stop_the_batch() -> None:
-    class BrokenBM25:
-        def search(self, *_: object, **__: object) -> list:
-            raise RuntimeError("индекс сломан")
+    def broken(*_: object, **__: object) -> list:
+        raise RuntimeError("индекс сломан")
 
     deps = _deps()
-    deps.bm25 = BrokenBM25()  # type: ignore[assignment]
+    deps.bm25.search = broken  # type: ignore[method-assign]
     result = asyncio.run(process_row(BatchRow(row=1, name="Бумага"), deps))
     assert result.status == "failed"
     assert result.error is not None and "индекс сломан" in result.error
@@ -739,3 +738,19 @@ def test_process_row_filled_counts_characteristics_not_general_fields() -> None:
     deps.catalog, deps.bm25 = cat, build_bm25(cat)
     row = BatchRow(row=1, name="Бумага для офисной техники Снегурочка 80 г/м2")
     assert asyncio.run(process_row(row, deps)).filled == 1
+
+
+def test_portal_export_row_text_reaches_pipeline() -> None:
+    """Выгрузка СТЕ портала: характеристики строкой «имя значение | …» без двоеточий не
+    разбираются на пары, поэтому идут в текст строки целиком, вместе с производителем и страной,
+    — иначе позиция КТРУ выбиралась по одному наименованию."""
+    data = (
+        "ID СТЕ;Наименование СТЕ;Модель;Производитель;Страна происхождения;Характеристики\n"
+        "1160207;Дрель-шуруповерт аккумуляторная Ставр;-;Ставр;КИТАЙ;"
+        "Вес 2.03 кг | Тип питания Аккумуляторный | Тип аккумулятора Литий-ионный\n"
+    ).encode()
+    [row] = parse_upload("tools.csv", data)
+    assert "Тип питания Аккумуляторный" in row.description
+    assert "Производитель: Ставр" in row.description
+    assert "Страна происхождения: КИТАЙ" in row.description
+    assert "1160207" not in row.description and "Модель" not in row.description

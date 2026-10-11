@@ -29,7 +29,7 @@ from app.ingest.profile import profile_table
 from app.ingest.readers import Table, read_tables
 from app.jobs import BatchJob
 from app.narrowing import question_note
-from app.schemas import CardIn, CharIn, Issue, accept_chars
+from app.schemas import MAX_DESCRIPTION, CardIn, CharIn, Issue, accept_chars
 
 log = logging.getLogger(__name__)
 
@@ -191,6 +191,44 @@ def parse_upload_json(
         return [_ROW_JSON.to_json(row) for row in _iter_rows(table, max_rows)]
 
 
+# Колонки, которые не говорят о свойствах товара: в текст строки не идут.
+_SERVICE_ROLES = {"id", "ktru_code", "okpd2_code", "kpgz_code", "price", "date", "inn", "unit"}
+_EMPTY = {"", "-", "—", "нет", "(не задано)"}
+_NO_HEADER = "col_"
+
+
+def _row_text(
+    record: dict[str, Any],
+    roles: dict[str, str],
+    name_col: str,
+    desc_col: str | None,
+    char_col: str | None,
+    *,
+    use_chars: bool,
+) -> str:
+    """Текст строки для конвейера — как если бы поставщик вставил его в форму: описание, колонка
+    характеристик целиком и остальные колонки «Заголовок: значение» (производитель, страна, модель).
+
+    Раньше в конвейер шло одно описание, а у выгрузки СТЕ портала его нет: характеристики лежат
+    строкой «Вес 2.03 кг | Тип питания Аккумулятор» без двоеточий, их разбор пуст, и позиция КТРУ
+    выбиралась по одному наименованию («питание от аккумулятора» терялось).
+    """
+    name = _text(record.get(name_col))
+    parts = [_text(record.get(desc_col))] if desc_col else []
+    if char_col and use_chars:
+        parts.append(_text(record.get(char_col)))
+    for col, role in roles.items():
+        if col in (name_col, desc_col, char_col) or role in _SERVICE_ROLES:
+            continue
+        if col.startswith(_NO_HEADER):
+            continue  # таблица без заголовков: «col_3: значение» — не подпись свойства
+        value = _text(record.get(col))
+        if value.casefold() in _EMPTY or value == name or len(value) > 200:
+            continue
+        parts.append(f"{col}: {value}")
+    return "\n".join(p for p in parts if p)[:MAX_DESCRIPTION]
+
+
 def _iter_rows(table: Table, max_rows: int | None = MAX_ROWS) -> Iterator[BatchRow]:
     """Строки таблицы: роли колонок — по содержимому (`profile_table`), а не по заголовку."""
     profile = profile_table(table)
@@ -201,6 +239,7 @@ def _iter_rows(table: Table, max_rows: int | None = MAX_ROWS) -> Iterator[BatchR
         raise BatchFormatError("не найдена колонка с наименованием СТЕ")
     desc_col = profile.column_for("description")
     char_col = profile.column_for("characteristics")
+    roles = {c.name: c.role for c in profile.columns}
     for i, record in enumerate(table.rows(), start=1):
         if max_rows is not None and i > max_rows:
             raise BatchTooLarge(f"строк больше {max_rows}: разбейте файл на части")
@@ -213,12 +252,23 @@ def _iter_rows(table: Table, max_rows: int | None = MAX_ROWS) -> Iterator[BatchR
         yield BatchRow(
             row=i,
             name=name,
-            description=_text(record.get(desc_col)) if desc_col else "",
+            # Колонка характеристик, которую не разобрать на пары, идёт в текст целиком.
+            description=_row_text(record, roles, name_col, desc_col, char_col, use_chars=not chars),
             characteristics=chars,
             rejected=rejected,
             empty=not name,
             raw={col: _text(record.get(col)) for col in table.columns},
         )
+
+
+def _pipeline_text(row: BatchRow) -> str:
+    """Описание строки и её разобранные характеристики строками «Имя: значение единица» — то,
+    что поставщик написал бы в мастере: по ним выбираются тип товара и позиция КТРУ."""
+    lines = [
+        f"{c.name}: {c.value} {c.unit}" if c.unit else f"{c.name}: {c.value}"
+        for c in row.characteristics
+    ]
+    return "\n".join([row.description, *lines]).strip()[:MAX_DESCRIPTION]
 
 
 async def process_row(row: BatchRow, deps: Any) -> BatchRowResult:
@@ -230,7 +280,7 @@ async def process_row(row: BatchRow, deps: Any) -> BatchRowResult:
         )
     try:
         session = await prepare_session(
-            AutofillIn(name=row.name, description=row.description), deps
+            AutofillIn(name=row.name, description=_pipeline_text(row)), deps
         )
         out = render(session, deps)
         if not out.ktru.candidates:
