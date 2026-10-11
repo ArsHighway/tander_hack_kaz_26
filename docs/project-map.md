@@ -40,7 +40,7 @@
 - **Стенд у сокомандников** — архив `data/bundle/tenderhack-kazan-stand-20261010.zip` (готовый `.env` без ключа +
   `data/catalog`, `metrics`, `cache/images`, векторы справочника для pgvector), распаковка в корень клона; шаги —
   README, «Данные стенда». Все зипки хакатона — в папку «Tender» на Google Диске (`H:\Мой диск\Tender`, правила
-  копирования — `.claude/settings.local.json`). Стенд выдаёт «не найдено» почти на всё — он на демо-справочнике
+  ). Стенд выдаёт «не найдено» почти на всё — он на демо-справочнике
   (пустые пути в `.env`). `.env` из архива от 10.10 написан под Ollama (`LLM_PROVIDER=ollama` код не принимает):
   блок `LLM_*` / `EMBED_*` заменить на блок из `.env.example`.
 - **Свой тестовый набор с портала** — `uv run python -m app.tools.build_testset` (из `backend/`, ~10 мин):
@@ -118,6 +118,5 @@
 - Метрики: `docker compose exec api python -m app.tools.evaluate`; BPMN: `uv run python -m scripts.bpmn`
 - После правки поиска, извлечения или сужения — `cd backend && uv run python -m app.tools.evaluate`: юнит-тесты не ловят
   ложные совпадения на товарах вне справочника (исправление опечаток «колёс» → «солев» нашла только оценка, порог уехал с 0,2)
-- Решения по ходу реализации модуля (57 строк «Ruling» с ценой ошибки) — `docs/plans/2026-10-01-portal-module-ledger.md`
 - Проверка глупым и враждебным вводом: промпт агента-поставщика `docs/qa/supplier-fuzz-prompt.md`, итог `docs/qa/2026-10-02-supplier-fuzz-report.md`. Новое правило карточки — сначала прогнать по `data/portal/` на ложные срабатывания
 - Секреты — только в `.env`; `.env.example` без реальных паролей.

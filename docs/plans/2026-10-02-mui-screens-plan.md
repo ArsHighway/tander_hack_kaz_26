@@ -56,4 +56,4 @@ TS-модулях с тестами `node --test`; вёрстка в TSX без 
 ## Task 6: проверка и документы
 
 `npm test`, `build`, `lint`; `e2e/flows.js` под новый интерфейс; accesslint; кадры 390 и 1366; DESIGN.md и
-CLAUDE.md под новый дизайн; `docs/demo-scenarios.md` под новые подписи.
+docs/project-map.md под новый дизайн; `docs/demo-scenarios.md` под новые подписи.

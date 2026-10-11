@@ -298,9 +298,9 @@ E, F — раздел 13 «Что осталось и кому», его мож�
 
 | Поток | Что | Владелец | Ветка | Статус |
 |---|---|---|---|---|
-| 0 | контракт API, развязка `pipeline.py` | retrobich + Claude | — | в main |
-| A | классификация по КТРУ | retrobich + Claude | — | в main, A1–A10 |
-| B | подгон значений под КТРУ | meister, доделка — retrobich + Claude | — | в main, B1–B16 |
+| 0 | контракт API, развязка `pipeline.py` | retrobich | — | в main |
+| A | классификация по КТРУ | retrobich | — | в main, A1–A10 |
+| B | подгон значений под КТРУ | meister, доделка — retrobich | — | в main, B1–B16 |
 | C | интерфейс мастера | Матвей? | `matvey-C` | не начат |
 | D | LLM: качество и выключатель у модератора | ____ | `feat/llm-switch` | D1 частично (API) |
 | E | массовая загрузка, низкий приоритет | ____ (можно вместе с D) | `fix/batch-queued-ttl` | тесты без кода |
@@ -327,7 +327,7 @@ E, F — раздел 13 «Что осталось и кому», его мож�
 |---|---|
 | `frontend/src/api/openapi.json`, `frontend/src/api/schema.d.ts` | Только владелец A, в том же коммите, что и изменение API. Остальные просят в чате |
 | `backend/app/config.py`, `backend/app/main.py`, `backend/app/resources.py` | Шаг 0 заводит все новые настройки и роутер сразу. Дальше правит A; E — только свои строки пакета |
-| `README.md`, `CLAUDE.md` (карта), `docs/**` | F. Исключение: `docs/demo-scenarios.md` правит C, потому что он связан с e2e |
+| `README.md`, `docs/project-map.md` (карта), `docs/**` | F. Исключение: `docs/demo-scenarios.md` правит C, потому что он связан с e2e |
 | `backend/tests/test_api_v1.py` | A. Остальные пишут свои тесты API в новых файлах `test_<поток>_*.py` |
 
 ### Шаг 0 — контракт и развязка `pipeline.py` (сделано 10.10, коммиты 1f50217, e7d996e, 3fb478a)
@@ -599,7 +599,7 @@ E, F — раздел 13 «Что осталось и кому», его мож�
 **Файлы:**
 - оценка: `app/tools/evaluate*.py`, `app/evaluation/*`, новые `app/tools/jury_cases.py` и
   `backend/tests/fixtures/jury_cases.jsonl`;
-- документы и схема: `docs/**` (кроме `demo-scenarios.md`), `README.md`, `CLAUDE.md`,
+- документы и схема: `docs/**` (кроме `demo-scenarios.md`), `README.md`, `docs/project-map.md`,
   `backend/scripts/bpmn.py`, `frontend/public/bpmn/*`;
 - страницы: `frontend/src/pages/metrics/*`, `frontend/src/pages/developers/*`;
 - тесты: `test_evaluation`, `test_holdout`, `test_bpmn`, `test_selfcheck`, `test_evaluate_general`.
@@ -613,7 +613,7 @@ E, F — раздел 13 «Что осталось и кому», его мож�
 | F3 | **Метрика КТРУ на отложенной выборке:** случаи `holdout_kazan`, чья категория связана с одним наименованием КТРУ, получают это наименование как эталон. Считаем долю верного типа КТРУ top-1/top-5. Нужно для A7 |
 | F4 | **BPMN под новый путь:** описание → тип КТРУ → сужение до кода → подгон значений (КТРУ, портал, новые) → проверка → модератор с выключателем LLM. `scripts/bpmn.py`, SVG во `frontend/public/bpmn` |
 | F5 | **README и страница «Метрики»:** блок КТРУ (тип, конечный код, пометки на наборе жюри), время на товар с моделью и без |
-| F6 | **Карта `CLAUDE.md`** — в конце, по отчётам потоков: новые файлы, флаги, команды |
+| F6 | **Карта `docs/project-map.md`** — в конце, по отчётам потоков: новые файлы, флаги, команды |
 | F7 | **Цифры для выступления** из F2 и F3, сценарий по шагам (раздел 11) |
 
 ## 6. Контракт API (шаг 0)

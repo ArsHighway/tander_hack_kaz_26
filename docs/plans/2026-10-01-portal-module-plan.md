@@ -110,7 +110,7 @@ pgvector, openpyxl, `regex`; React 19, Vite, TypeScript, Tailwind v4.
       def all(self) -> list[Position]
       def __len__(self) -> int
   ```
-- Решение: справочник в памяти процесса, а не в Postgres (отступление от спеки §4, записать в ledger). Причина:
+- Решение: справочник в памяти процесса, а не в Postgres (отступление от спеки §4, записать в журнал решений). Причина:
   справочник читается на каждом запросе и меняется раз в загрузку; в памяти каждого реплики API и воркера нет
   сетевых походов, масштабирование не страдает. В Postgres остаются эмбеддинги и заявки.
 
@@ -136,7 +136,7 @@ pgvector, openpyxl, `regex`; React 19, Vite, TypeScript, Tailwind v4.
 
 - [ ] Зонд до сбора: `GetSku` карточки 47453345 (как в `docs/research/sku-47453345.json`) отдаёт у характеристик
   `ktruValues`/`spgzValues`. Второй зонд: публичная карточка КТРУ на zakupki.gov.ru для бумаги
-  (`17.12.14.129-…`) — открывается ли без входа и есть ли перечни. Итог зондов — в ledger.
+  (`17.12.14.129-…`) — открывается ли без входа и есть ли перечни. Итог зондов — в журнале решений.
 - [ ] Сбор: карточки из `data/portal/skus.jsonl` по областям «Бумажная продукция», «Изделия канцелярские, бумага и
   бумажные изделия», «Принадлежности канцелярские», «Химия бытовая», «Товары хозяйственные», «Предметы гигиены»;
   последовательно, пауза 0,8 с, как `fetch_details.py`. Позиция — СПГЗ карточки (код `spgz:<id>`, имя СПГЗ) или
@@ -144,7 +144,7 @@ pgvector, openpyxl, `regex`; React 19, Vite, TypeScript, Tailwind v4.
   `spgzValues`; `required` ← `isObligatory`, `level_define` ← `isLevelDefine`; `source` — `portal-spgz` или
   `portal-ktru`. Позиции с одинаковым кодом из разных карточек сливаются (объединение перечней).
 - [ ] Если перечней нет нигде: `demo.json` = позиции фикстуры плюс 10–15 синтетических позиций тех же областей,
-  `source: "synthetic"`, и пометка «демо-справочник» уходит в `/metrics` (Task 13). Решение — в ledger.
+  `source: "synthetic"`, и пометка «демо-справочник» уходит в `/metrics` (Task 13). Решение — в журнале решений.
 - [ ] Проверка: `Catalog.load([Path("data/catalog/demo.json")])` грузится, позиций ≥ 30, у ≥ 70 % характеристик
   непустой перечень или диапазон (печатать числа, а не «ок»).
 
@@ -283,7 +283,7 @@ pgvector, openpyxl, `regex`; React 19, Vite, TypeScript, Tailwind v4.
   `backend/app/search/vectors.py`, `backend/app/search/candidates.py`, `backend/tests/test_search.py`,
   `backend/migrations/versions/<rev>_catalog_embedding.py`, `backend/app/tools/index_catalog.py`
 - Modify: `backend/pyproject.toml`/`uv.lock` (`uv add snowballstemmer` — стемминг без словарей; замена на
-  pymorphy3 допустима с записью в ledger)
+  pymorphy3 допустима с записью в журнал решений)
 
 **Interfaces:**
 - Consumes: `Catalog`, `Position` (Task 2); `Glossary.expand` (`app/glossary`); `LLMClient.embed`.
@@ -544,7 +544,7 @@ pgvector, openpyxl, `regex`; React 19, Vite, TypeScript, Tailwind v4.
   `accuracy_at_k([["a","b"],["c","d"]], ["b","x"], 1) == 0.0`, `k=2 → 0.5`;
   `precision_recall({("a","1"),("b","2")}, {("a","1")}) == (0.5, 1.0)`.
 - [ ] Прогон `uv run python -m app.tools.evaluate` на демо-справочнике; калибровка `MIN_SCORE` по доле честных
-  отказов и Accuracy@5 записывается в ledger числами.
+  отказов и Accuracy@5 записывается в журнал решений числами.
 
 ### Task 14: Клиент API на фронте из OpenAPI
 
@@ -694,7 +694,7 @@ pgvector, openpyxl, `regex`; React 19, Vite, TypeScript, Tailwind v4.
 
 **Files:**
 - Create: `frontend/e2e/flows.js` (сценарии playwright), `docs/demo-scenarios.md`
-- Modify: `CLAUDE.md` (карта кода, команды), `README.md`, `.env.example`, `docker-compose.yml` (если Task 2 не
+- Modify: `docs/project-map.md` (карта кода, команды), `README.md`, `.env.example`, `docker-compose.yml` (если Task 2 не
   закрыла), память `local-prototype-outside-git` (прототип заменён экранами в `src/`)
 
 - [ ] `docker compose up -d --build` [проверено: Docker 29.3.1, 01.10.2026] → `migrate` выходит с 0,
@@ -711,7 +711,7 @@ pgvector, openpyxl, `regex`; React 19, Vite, TypeScript, Tailwind v4.
 
 ---
 
-## Ledger
+## Журнал решений
 
 Формат: `Task <N>: Ruling: <находка> — <что решил и почему>`.
 

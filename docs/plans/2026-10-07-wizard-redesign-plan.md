@@ -47,7 +47,7 @@ TypeScript 6, `npm test` (`node --test "src/**/*.test.ts"`).
   только внутри предпросмотра. Google Fonts нельзя: демо без интернета.
 - Радиусы 6 (кнопки, поля), 8 (списки, полоса шагов, панели), 10 (внешние блоки). Теней нет, кроме нижней
   полосы и мобильной шторки. Отступы по сетке 4/8/12/16/24. Разделители — 1 px `line`.
-- Запреты (antislop): заглавные подписи с разрядкой, пилюли-бейджи без функции, карточка в карточке, тени на
+- Запреты: заглавные подписи с разрядкой, пилюли-бейджи без функции, карточка в карточке, тени на
   всём, эмодзи, длинное тире в текстах интерфейса, кнопки «Далее» без глагола, выдуманные цифры, мёртвые кнопки и
   ссылки (элемент появляется в той задаче, где начинает работать). Исключение: предпросмотр копирует портал
   (Open Sans, вкладки капсом, его синий) и только там.
@@ -63,8 +63,8 @@ TypeScript 6, `npm test` (`node --test "src/**/*.test.ts"`).
 - Проверки как в CI: бэкенд `cd backend && uv run ruff check . && uv run ruff format --check . && uv run mypy &&
   uv run pytest -q`; фронт `cd frontend && npm test && npm run lint && npm run build`
   [проверено: CI 37522088218 на 68daeed, 2026-10-06].
-- Перед вёрсткой (Task 1, 5, 6, 7, 9) — скиллы `taste` и `antislop-ui` (режим «во время работы»); спорят с
-  `DESIGN.md` — побеждает `DESIGN.md`, расхождение назвать пользователю.
+- Перед вёрсткой (Task 1, 5, 6, 7, 9) — сверка с `DESIGN.md`; при расхождении с общими руководствами побеждает
+  `DESIGN.md`.
 - После пересборки файлов в `data/catalog/` перезапустить api и worker, чтобы они перечитали справочник
   [вызов платформы не запускался: перезапуск сервисов compose].
 - Коммиты — conventional, по задаче, только если пользователь разрешил коммитить.
@@ -92,14 +92,13 @@ TypeScript 6, `npm test` (`node --test "src/**/*.test.ts"`).
   `frontend/src/shell/AppShell.tsx`, `frontend/src/shell/Page.tsx`, все места, где используются `PORTAL_BLUE`,
   `MARK`, `MARK_FIELD` (найти поиском)
 - Rewrite: `DESIGN.md`
-- Modify: `CLAUDE.md` (строки `DESIGN.md` и `theme.ts` в карте кода)
+- Modify: `docs/project-map.md` (строки `DESIGN.md` и `theme.ts` в карте кода)
 
 **Interfaces:**
 - Produces: `theme.ts` экспортирует `TOKENS` (`ink`, `ink2`, `mute`, `line`, `acc`, `accSoft`, `mark`, `err`),
   `MONO` (строка `font-family` Plex Mono) и `theme`. `PORTAL_BLUE`, `MARK`, `MARK_FIELD` удаляются, их места
   переводятся на `TOKENS`.
 
-- [x] Загрузить `taste` и `antislop-ui`, проверить журнал наблюдений по ним (grep из `~/.claude/CLAUDE.md`).
 - [x] Поставить шрифты IBM Plex Sans, IBM Plex Mono, Open Sans из `@fontsource` (кириллица в подмножестве)
   `[вызов платформы не запускался: установка трёх пакетов npm]`. Onest и JetBrains Mono удалить, если после
   замены их никто не импортирует.
@@ -112,7 +111,7 @@ TypeScript 6, `npm test` (`node --test "src/**/*.test.ts"`).
 - [x] Старые экраны («Массовая загрузка», «Мои заявки», «Модерация», «Метрики», «API») открываются и читаются в
   новой теме: скриншот каждого 1366×768 (`playwright-cli`), очевидное починить.
 - [x] `DESIGN.md` переписан по разделу 3 спецификации: строка Design Read, токены с причинами, шрифты, форма,
-  мотивы, запреты, исключение для предпросмотра. `CLAUDE.md` обновлён.
+  мотивы, запреты, исключение для предпросмотра. `docs/project-map.md` обновлён.
 - [x] Проверки фронта (Global Constraints).
 - [x] Коммит `feat(web): тема IBM Plex и кобальт, новая шапка`
 
@@ -583,7 +582,7 @@ TypeScript 6, `npm test` (`node --test "src/**/*.test.ts"`).
 ### Task 13: Сквозные сценарии, проверка, документы
 
 **Files:**
-- Modify: `frontend/e2e/flows.js`, `docs/demo-scenarios.md`, `docs/demo-texts.txt`, `CLAUDE.md` (карта:
+- Modify: `frontend/e2e/flows.js`, `docs/demo-scenarios.md`, `docs/demo-texts.txt`, `docs/project-map.md` (карта:
   `pages/create/wizard/`, новые эндпоинты, `warm_images`, `fetch_standards --entity-only`, `entities.jsonl`,
   `data/cache/images`), `docs/plans/2026-10-07-wizard-redesign-design.md` (итог)
 
@@ -593,7 +592,7 @@ TypeScript 6, `npm test` (`node --test "src/**/*.test.ts"`).
 - [x] Скриншоты каждого шага: 390×844, 899×800, 900×800, 1366×768, 1440×720, 1440×900; наименование на 200
   символов; предпросмотр.
 - [x] `accessibility-scan` по шагам мастера; `web-design-guidelines` по изменённым файлам; найденное починить.
-- [x] Delivery Gate `antislop` с поэлементным прокликом.
+- [x] финальная проверка с поэлементным прокликом.
 - [x] Полные проверки обеих сторон; CI на последнем SHA ветки (`gh run list -L1`, все джобы `success`)
   [проверено: 2026-10-06].
 - [x] Коммит `docs: мастер в сценариях и карте проекта`

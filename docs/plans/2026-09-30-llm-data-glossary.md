@@ -50,5 +50,5 @@
 - Тесты приёма и профиля гоняются на этих файлах; на хакатоне те же инструменты — на настоящих данных.
 
 ### Task 6: Правила и проверка
-- Правила в `CLAUDE.md` проекта; `docker compose` и `.env.example` под `LLM_*` / `EMBED_*`.
+- Правила в `docs/project-map.md` проекта; `docker compose` и `.env.example` под `LLM_*` / `EMBED_*`.
 - Гейты: `ruff check`, `pytest`, сборка compose, `llm_smoke` против локального Ollama.
