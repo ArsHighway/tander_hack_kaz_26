@@ -1,0 +1,230 @@
+name: tenderhack-kazan
+
+x-backend-env: &backend-env
+  DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER:-tenderhack}:${POSTGRES_PASSWORD:-tenderhack}@postgres:5432/${POSTGRES_DB:-tenderhack}
+  REDIS_URL: redis://redis:6379/0
+  REDIS_SOCKET_TIMEOUT_S: ${REDIS_SOCKET_TIMEOUT_S:-30}
+  JOB_TTL_S: ${JOB_TTL_S:-3600}
+  BATCH_PENDING_TTL_S: ${BATCH_PENDING_TTL_S:-86400}
+  BATCH_TTL_S: ${BATCH_TTL_S:-604800}
+  RABBITMQ_URL: amqp://${RABBITMQ_USER:-tenderhack}:${RABBITMQ_PASSWORD:-tenderhack}@rabbitmq:5672/
+  # LLM: локальная gemma-4-31b-it-Q8_0.gguf в llama.cpp server (сервис llm, профиль llm), протокол
+  # OpenAI-совместимый. Модель второго слоя — та же, на том же сервере.
+  LLM_PROVIDER: ${LLM_PROVIDER:-openai}
+  LLM_BASE_URL: ${LLM_BASE_URL:-http://llm:8080/v1}
+  LLM_API_KEY: ${LLM_API_KEY:-}
+  LLM_CHAT_MODEL: ${LLM_CHAT_MODEL:-gemma-4-31b-it-Q8_0}
+  LLM_REVIEW_MODEL: ${LLM_REVIEW_MODEL:-gemma-4-31b-it-Q8_0}
+  LLM_THINK: ${LLM_THINK:-false}
+  LLM_REQUIRED: ${LLM_REQUIRED:-false}
+  LLM_CACHE_TTL_S: ${LLM_CACHE_TTL_S:-86400}
+  # Лимиты под облако/сервер: 429 — повтор с паузой; одновременных запросов к модели на процесс.
+  LLM_RATE_LIMIT_RETRIES: ${LLM_RATE_LIMIT_RETRIES:-6}
+  LLM_MAX_CONCURRENCY: ${LLM_MAX_CONCURRENCY:-4}
+  # Сколько ждать модель в шаге мастера и строке пакета, с (пусто — без предела).
+  LLM_BUDGET_S: ${LLM_BUDGET_S-15}
+  LLM_RERANK_TYPES: ${LLM_RERANK_TYPES:-true}
+  # Массовая загрузка: строк в порции очереди и строк одновременно в одном воркере.
+  BATCH_CHUNK_ROWS: ${BATCH_CHUNK_ROWS:-20}
+  WORKER_CONCURRENCY: ${WORKER_CONCURRENCY:-4}
+  # Эмбеддинги: bge-m3.gguf в отдельном llama.cpp server (сервис embed, профиль llm).
+  EMBED_PROVIDER: ${EMBED_PROVIDER:-openai}
+  EMBED_BASE_URL: ${EMBED_BASE_URL:-http://embed:8080/v1}
+  EMBED_API_KEY: ${EMBED_API_KEY:-}
+  EMBED_MODEL: ${EMBED_MODEL:-bge-m3}
+  LOG_LEVEL: ${LOG_LEVEL:-INFO}
+  # Справочник позиций (КТРУ/СПГЗ): файлы из тома ./data, через запятую.
+  # Пусто — демо-справочник из репозитория; справочник организаторов — файлы в ./data (например, data/ktru.csv).
+  CATALOG_PATHS: ${CATALOG_PATHS:-}
+  # Наименования живых СТЕ для поиска категории по похожим (build_exemplars), файл из ./data.
+  EXEMPLARS_PATH: ${EXEMPLARS_PATH:-}
+  # Векторы тех же наименований (build_exemplar_vectors), файл из ./data: второй голос категорий.
+  EXEMPLAR_VECTORS_PATH: ${EXEMPLAR_VECTORS_PATH:-}
+  # Двойники: такая СТЕ уже есть на портале (build_twins), файл из ./data.
+  TWINS_PATH: ${TWINS_PATH:-}
+  # Справочник КТРУ (build_ktru_catalog), файлы из ./data: позиция КТРУ внутри найденной категории.
+  KTRU_PATHS: ${KTRU_PATHS:-}
+  # Порог «вне справочника» и пути отчётов «Метрик» (тот же том ./data); картинки портала — кэш на диске.
+  SEARCH_MIN_SCORE: ${SEARCH_MIN_SCORE:-0.2}
+  METRICS_PATH: ${METRICS_PATH:-data/metrics/latest.json}
+  PORTAL_REPORT_PATH: ${PORTAL_REPORT_PATH:-data/metrics/portal.json}
+  HOLDOUT_REPORT_PATH: ${HOLDOUT_REPORT_PATH:-data/metrics/holdout.json}
+  IMAGE_CACHE_DIR: ${IMAGE_CACHE_DIR:-data/cache/images}
+  IMAGE_WAIT_S: ${IMAGE_WAIT_S:-1}
+  IMAGE_TIMEOUT_S: ${IMAGE_TIMEOUT_S:-30}
+
+services:
+  postgres:
+    image: pgvector/pgvector:pg17
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-tenderhack}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-tenderhack}
+      POSTGRES_DB: ${POSTGRES_DB:-tenderhack}
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "${REDIS_PORT:-6379}:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  rabbitmq:
+    image: rabbitmq:4-management-alpine
+    environment:
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_USER:-tenderhack}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASSWORD:-tenderhack}
+    ports:
+      - "${RABBITMQ_PORT:-5672}:5672"
+      - "${RABBITMQ_UI_PORT:-15672}:15672"
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 20
+
+  # Локальные модели: llama.cpp server на NVIDIA GPU (нужен NVIDIA Container Toolkit или Docker Desktop
+  # с WSL2). Файлы .gguf — в ./models (models/README.md). Запуск: docker compose --profile llm up -d
+  # Чат: gemma-4-31b-it-Q8_0.gguf (~33 ГБ). -c — общий контекст на все слоты (-np), на запрос — c / np.
+  llm:
+    image: ${LLAMA_IMAGE:-ghcr.io/ggml-org/llama.cpp:server-cuda}
+    profiles: ["llm"]
+    command:
+      - "-m"
+      - "/models/${LLM_MODEL_FILE:-gemma-4-31b-it-Q8_0.gguf}"
+      - "--alias"
+      - "${LLM_CHAT_MODEL:-gemma-4-31b-it-Q8_0}"
+      - "--host"
+      - "0.0.0.0"
+      - "--port"
+      - "8080"
+      - "-ngl"
+      - "999"
+      - "-c"
+      - "${LLM_CTX:-16384}"
+      - "-np"
+      - "${LLM_PARALLEL:-4}"
+      - "--jinja"
+    ports:
+      - "127.0.0.1:${LLM_PORT:-8081}:8080"
+    volumes:
+      - ./models:/models:ro
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+
+  # Эмбеддинги bge-m3 (1024 измерения, как в индексе pgvector) — второй экземпляр llama.cpp server.
+  embed:
+    image: ${LLAMA_IMAGE:-ghcr.io/ggml-org/llama.cpp:server-cuda}
+    profiles: ["llm"]
+    command:
+      - "-m"
+      - "/models/${EMBED_MODEL_FILE:-bge-m3-Q8_0.gguf}"
+      - "--alias"
+      - "${EMBED_MODEL:-bge-m3}"
+      - "--host"
+      - "0.0.0.0"
+      - "--port"
+      - "8080"
+      - "--embedding"
+      - "--pooling"
+      - "cls"
+      - "-ngl"
+      - "999"
+      - "-c"
+      - "8192"
+      - "-b"
+      - "8192"
+      - "-ub"
+      - "8192"
+    ports:
+      - "127.0.0.1:${EMBED_PORT:-8082}:8080"
+    volumes:
+      - ./models:/models:ro
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+
+  migrate:
+    build: ./backend
+    image: tenderhack-kazan-backend:dev
+    command: ["alembic", "upgrade", "head"]
+    environment: *backend-env
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  api:
+    build: ./backend
+    image: tenderhack-kazan-backend:dev
+    environment:
+      <<: *backend-env
+      # Процессов uvicorn в контейнере: API без состояния (сессии, пакеты и кэш — в Redis).
+      API_WORKERS: ${API_WORKERS:-1}
+    volumes:
+      - ./data:/app/data
+    ports:
+      - "${API_PORT:-8000}:8000"
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+      redis:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/api/health', timeout=2)"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      # Справочники и индексы грузятся ~2,5 минуты (холодный старт вместе с воркером): пока идёт загрузка,
+      # неудачные проверки не считаются, и `up --wait` дожидается готовности, а не падает.
+      start_period: 240s
+
+  # Реплик воркера несколько: порции пакета из очереди jobs.batch разбирают все.
+  # Число — WORKER_REPLICAS в .env или на ходу: docker compose up -d --scale worker=N
+  worker:
+    build: ./backend
+    image: tenderhack-kazan-backend:dev
+    command: ["faststream", "run", "app.worker:app"]
+    deploy:
+      replicas: ${WORKER_REPLICAS:-2}
+    environment: *backend-env
+    volumes:
+      - ./data:/app/data
+    depends_on:
+      redis:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+
+  web:
+    build: ./frontend
+    image: tenderhack-kazan-web:dev
+    ports:
+      - "${WEB_PORT:-8080}:80"
+    depends_on:
+      api:
+        condition: service_healthy
+
+volumes:
+  pgdata:

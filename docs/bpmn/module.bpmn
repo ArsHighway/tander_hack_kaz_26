@@ -1,0 +1,213 @@
+<?xml version='1.0' encoding='utf-8'?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" id="defs" targetNamespace="https://tenderhack.ru/kazan">
+  <bpmn:collaboration id="collab">
+    <bpmn:participant id="pool" name="Создание СТЕ на Портале поставщиков" processRef="process" />
+  </bpmn:collaboration>
+  <bpmn:process id="process" isExecutable="false">
+    <bpmn:laneSet id="lanes">
+      <bpmn:lane id="lane_supplier" name="Поставщик (портал)">
+        <bpmn:flowNodeRef>start</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>source</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>enter</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>answer</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>review</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>submit</bpmn:flowNodeRef>
+      </bpmn:lane>
+      <bpmn:lane id="lane_module" name="Модуль автозаполнения">
+        <bpmn:flowNodeRef>batch</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>autofill</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>unique</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>check</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>blocking</bpmn:flowNodeRef>
+      </bpmn:lane>
+      <bpmn:lane id="lane_moderator" name="Модератор (портал)">
+        <bpmn:flowNodeRef>moderate</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>decision</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>publish</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>end</bpmn:flowNodeRef>
+      </bpmn:lane>
+    </bpmn:laneSet>
+    <bpmn:startEvent id="start" name="Нужна новая СТЕ" />
+    <bpmn:exclusiveGateway id="source" name="Один товар или файл?" default="flow1" />
+    <bpmn:userTask id="enter" name="Ввести наименование и описание" />
+    <bpmn:serviceTask id="batch" name="Разобрать файл: строки порциями через очередь воркерам" />
+    <bpmn:serviceTask id="autofill" name="Найти категорию и КТРУ, заполнить из текста и СТЕ портала (без модели — правилами)" />
+    <bpmn:exclusiveGateway id="unique" name="Категория и КТРУ однозначны?" default="flow8" />
+    <bpmn:userTask id="answer" name="Ответить на вопрос или дополнить описание" />
+    <bpmn:userTask id="review" name="Принять или поправить значения и подсказки" />
+    <bpmn:serviceTask id="check" name="Проверить карточку: модерация, дубли, числа, опечатки" />
+    <bpmn:exclusiveGateway id="blocking" name="Есть блокирующие замечания?" default="flow12" />
+    <bpmn:userTask id="submit" name="Отправить на модерацию" />
+    <bpmn:userTask id="moderate" name="Проверить заявку с замечаниями модуля" />
+    <bpmn:exclusiveGateway id="decision" name="Принять заявку?" default="flow15" />
+    <bpmn:userTask id="publish" name="Опубликовать СТЕ в каталоге" />
+    <bpmn:endEvent id="end" name="СТЕ в каталоге" />
+    <bpmn:sequenceFlow id="flow0" sourceRef="start" targetRef="source" />
+    <bpmn:sequenceFlow id="flow1" sourceRef="source" targetRef="enter" name="один товар" />
+    <bpmn:sequenceFlow id="flow2" sourceRef="source" targetRef="batch" name="файл с товарами">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${input == 'file'}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="flow3" sourceRef="batch" targetRef="autofill" />
+    <bpmn:sequenceFlow id="flow4" sourceRef="enter" targetRef="autofill" name="POST /autofill" />
+    <bpmn:sequenceFlow id="flow5" sourceRef="autofill" targetRef="unique" />
+    <bpmn:sequenceFlow id="flow6" sourceRef="unique" targetRef="answer" name="нет">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${ktru.final_code == null}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="flow7" sourceRef="answer" targetRef="unique" name="POST /answer" />
+    <bpmn:sequenceFlow id="flow8" sourceRef="unique" targetRef="review" name="да" />
+    <bpmn:sequenceFlow id="flow9" sourceRef="review" targetRef="check" name="POST /check" />
+    <bpmn:sequenceFlow id="flow10" sourceRef="check" targetRef="blocking" />
+    <bpmn:sequenceFlow id="flow11" sourceRef="blocking" targetRef="review" name="да">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${verdict == 'needs_fix'}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="flow12" sourceRef="blocking" targetRef="submit" name="нет" />
+    <bpmn:sequenceFlow id="flow13" sourceRef="submit" targetRef="moderate" />
+    <bpmn:sequenceFlow id="flow14" sourceRef="moderate" targetRef="decision" />
+    <bpmn:sequenceFlow id="flow15" sourceRef="decision" targetRef="publish" name="да" />
+    <bpmn:sequenceFlow id="flow16" sourceRef="publish" targetRef="end" />
+    <bpmn:sequenceFlow id="flow17" sourceRef="decision" targetRef="review" name="нет: вернуть с замечаниями">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${decision == 'returned'}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+  </bpmn:process>
+  <bpmndi:BPMNDiagram id="diagram">
+    <bpmndi:BPMNPlane id="plane" bpmnElement="collab">
+      <bpmndi:BPMNShape id="pool_di" bpmnElement="pool" isHorizontal="true">
+        <dc:Bounds x="0" y="0" width="1790" height="570" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="lane_supplier_di" bpmnElement="lane_supplier" isHorizontal="true">
+        <dc:Bounds x="40" y="0" width="1750" height="190" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="lane_module_di" bpmnElement="lane_module" isHorizontal="true">
+        <dc:Bounds x="40" y="190" width="1750" height="190" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="lane_moderator_di" bpmnElement="lane_moderator" isHorizontal="true">
+        <dc:Bounds x="40" y="380" width="1750" height="190" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="start_di" bpmnElement="start">
+        <dc:Bounds x="122" y="77" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="source_di" bpmnElement="source" isMarkerVisible="true">
+        <dc:Bounds x="285" y="70" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="enter_di" bpmnElement="enter">
+        <dc:Bounds x="410" y="55" width="140" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="batch_di" bpmnElement="batch">
+        <dc:Bounds x="240" y="245" width="140" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="autofill_di" bpmnElement="autofill">
+        <dc:Bounds x="410" y="245" width="140" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="unique_di" bpmnElement="unique" isMarkerVisible="true">
+        <dc:Bounds x="625" y="260" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="answer_di" bpmnElement="answer">
+        <dc:Bounds x="580" y="55" width="140" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="review_di" bpmnElement="review">
+        <dc:Bounds x="750" y="55" width="140" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="check_di" bpmnElement="check">
+        <dc:Bounds x="750" y="245" width="140" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="blocking_di" bpmnElement="blocking" isMarkerVisible="true">
+        <dc:Bounds x="965" y="260" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="submit_di" bpmnElement="submit">
+        <dc:Bounds x="1090" y="55" width="140" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="moderate_di" bpmnElement="moderate">
+        <dc:Bounds x="1090" y="435" width="140" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="decision_di" bpmnElement="decision" isMarkerVisible="true">
+        <dc:Bounds x="1305" y="450" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="publish_di" bpmnElement="publish">
+        <dc:Bounds x="1430" y="435" width="140" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="end_di" bpmnElement="end">
+        <dc:Bounds x="1652" y="457" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="flow0_di" bpmnElement="flow0">
+        <di:waypoint x="158" y="95" />
+        <di:waypoint x="285" y="95" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="flow1_di" bpmnElement="flow1">
+        <di:waypoint x="335" y="95" />
+        <di:waypoint x="410" y="95" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="flow2_di" bpmnElement="flow2">
+        <di:waypoint x="310" y="120" />
+        <di:waypoint x="310" y="245" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="flow3_di" bpmnElement="flow3">
+        <di:waypoint x="380" y="285" />
+        <di:waypoint x="410" y="285" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="flow4_di" bpmnElement="flow4">
+        <di:waypoint x="480" y="135" />
+        <di:waypoint x="480" y="245" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="flow5_di" bpmnElement="flow5">
+        <di:waypoint x="550" y="285" />
+        <di:waypoint x="625" y="285" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="flow6_di" bpmnElement="flow6">
+        <di:waypoint x="636" y="260" />
+        <di:waypoint x="636" y="135" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="flow7_di" bpmnElement="flow7">
+        <di:waypoint x="664" y="135" />
+        <di:waypoint x="664" y="260" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="flow8_di" bpmnElement="flow8">
+        <di:waypoint x="675" y="285" />
+        <di:waypoint x="710" y="285" />
+        <di:waypoint x="710" y="160" />
+        <di:waypoint x="790" y="160" />
+        <di:waypoint x="790" y="135" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="flow9_di" bpmnElement="flow9">
+        <di:waypoint x="820" y="135" />
+        <di:waypoint x="820" y="245" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="flow10_di" bpmnElement="flow10">
+        <di:waypoint x="890" y="285" />
+        <di:waypoint x="965" y="285" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="flow11_di" bpmnElement="flow11">
+        <di:waypoint x="990" y="260" />
+        <di:waypoint x="990" y="212" />
+        <di:waypoint x="860" y="212" />
+        <di:waypoint x="860" y="135" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="flow12_di" bpmnElement="flow12">
+        <di:waypoint x="1015" y="285" />
+        <di:waypoint x="1130" y="285" />
+        <di:waypoint x="1130" y="135" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="flow13_di" bpmnElement="flow13">
+        <di:waypoint x="1190" y="135" />
+        <di:waypoint x="1190" y="435" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="flow14_di" bpmnElement="flow14">
+        <di:waypoint x="1230" y="475" />
+        <di:waypoint x="1305" y="475" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="flow15_di" bpmnElement="flow15">
+        <di:waypoint x="1355" y="475" />
+        <di:waypoint x="1430" y="475" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="flow16_di" bpmnElement="flow16">
+        <di:waypoint x="1570" y="475" />
+        <di:waypoint x="1652" y="475" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="flow17_di" bpmnElement="flow17">
+        <di:waypoint x="1330" y="450" />
+        <di:waypoint x="1330" y="22" />
+        <di:waypoint x="820" y="22" />
+        <di:waypoint x="820" y="55" />
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>

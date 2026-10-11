@@ -1,0 +1,2917 @@
+{
+  "version": "synthetic-similar-2026-10-08",
+  "source": "ktru_similar_products_30.json",
+  "description": "Синтетический тестовый каталог из 30 максимально похожих позиций для проверки поиска КТРУ. Коды TEST не являются официальными кодами КТРУ.",
+  "positions": [
+    {
+      "code": "17.12.14.129-TEST0001",
+      "name": "Бумага для офисной техники белая A4 80 г/м² 500 листов, матовая",
+      "okpd2": "17.12.14.129",
+      "unit": "пач",
+      "characteristics": [
+        {
+          "name": "Формат",
+          "kind": "qualitative",
+          "values": [
+            "A4"
+          ],
+          "required": true,
+          "level_define": true
+        },
+        {
+          "name": "Масса бумаги площадью 1 м2",
+          "kind": "quantitative",
+          "unit": "г/м2",
+          "values": [
+            "80"
+          ],
+          "required": true,
+          "level_define": true
+        },
+        {
+          "name": "Количество листов в пачке",
+          "kind": "quantitative",
+          "unit": "шт",
+          "values": [
+            "500"
+          ],
+          "required": true,
+          "level_define": true
+        },
+        {
+          "name": "Белизна по CIE",
+          "kind": "quantitative",
+          "unit": "%",
+          "values": [
+            "146-155"
+          ],
+          "required": true
+        },
+        {
+          "name": "Непрозрачность",
+          "kind": "quantitative",
+          "unit": "%",
+          "values": [
+            "92-94"
+          ],
+          "required": true
+        },
+        {
+          "name": "Тип поверхности",
+          "kind": "qualitative",
+          "values": [
+            "Матовая"
+          ],
+          "required": true,
+          "level_define": true
+        },
+        {
+          "name": "Возможность двусторонней печати",
+          "kind": "qualitative",
+          "values": [
+            "Да"
+          ],
+          "required": true
+        },
+        {
+          "name": "Совместимость с лазерной печатью",
+          "kind": "qualitative",
+          "values": [
+            "Лазерная"
+          ],
+          "required": true
+        },
+        {
+          "name": "Совместимость со струйной печатью",
+          "kind": "qualitative",
+          "values": [
+            "Струйная"
+          ],
+          "required": true
+        },
+        {
+          "name": "Толщина листа",
+          "kind": "quantitative",
+          "unit": "мкм",
+          "values": [
+            "2"
+          ],
+          "required": false
+        }
+      ]
+    },
+    {
+      "code": "17.12.14.129-TEST0002",
+      "name": "Бумага для офисной техники белая A4 80 г/м² 500 листов, матовая",
+      "okpd2": "17.12.14.129",
+      "unit": "пач",
+      "characteristics": [
+        {
+          "name": "Формат",
+          "kind": "qualitative",
+          "values": [
+            "A4"
+          ],
+          "required": true,
+          "level_define": true
+        },
+        {
+          "name": "Масса бумаги площадью 1 м2",
+          "kind": "quantitative",
+          "unit": "г/м2",
+          "values": [
+            "80"
+          ],
+          "required": true,
+          "level_define": true
+        },
+        {
+          "name": "Количество листов в пачке",
+          "kind": "quantitative",
+          "unit": "шт",
+          "values": [
+            "500"
+          ],
+          "required": true,
+          "level_define": true
+        },
+        {
+          "name": "Белизна по CIE",
+          "kind": "quantitative",
+          "unit": "%",
+          "values": [
+            "156-160"
+          ],
+          "required": true
+        },
+        {
+          "name": "Непрозрачность",
+          "kind": "quantitative",
+          "unit": "%",
+          "values": [
+            "92-94"
+          ],
+          "required": true
+        },
+        {
+          "name": "Тип поверхности",
+          "kind": "qualitative",
+          "values": [
+            "Матовая"
+          ],
+          "required": true,
+          "level_define": true
+        },
+        {
+          "name": "Возможность двусторонней печати",
+          "kind": "qualitative",
+          "values": [
+            "Да"
+          ],
+          "required": true
+        },
+        {
+          "name": "Совместимость с лазерной печатью",
+          "kind": "qualitative",
+          "values": [
+            "Лазерная"
+          ],
+          "required": true
+        },
+        {
+          "name": "Совместимость со струйной печатью",
+          "kind": "qualitative",
+          "values": [
+            "Струйная"
+          ],
+          "required": true
+        },
+        {
+          "name": "Толщина листа",
+          "kind": "quantitative",
+          "unit": "мкм",
+          "values": [
+            "2"
+          ],
+          "required": false
+        }
+      ]
+    },
+    {
+      "code": "17.12.14.129-TEST0003",
+      "name": "Бумага для офисной техники белая A4 80 г/м² 250 листов, матовая",
+      "okpd2": "17.12.14.129",
+      "unit": "пач",
+      "characteristics": [
+        {
+          "name": "Формат",
+          "kind": "qualitative",
+          "values": [
+            "A4"
+          ],
+          "required": true,
+          "level_define": true
+        },
+        {
+          "name": "Масса бумаги площадью 1 м2",
+          "kind": "quantitative",
+          "unit": "г/м2",
+          "values": [
+            "80"
+          ],
+          "required": true,
+          "level_define": true
+        },
+        {
+          "name": "Количество листов в пачке",
+          "kind": "quantitative",
+          "unit": "шт",
+          "values": [
+            "250"
+          ],
+          "required": true,
+          "level_define": true
+        },
+        {
+          "name": "Белизна по CIE",
+          "kind": "quantitative",
+          "unit": "%",
+          "values": [
+            "146-155"
+          ],
+          "required": true
+        },
+        {
+          "name": "Непрозрачность",
+          "kind": "quantitative",
+          "unit": "%",
+          "values": [
+            "92-94"
+          ],
+          "required": true
+        },
+        {
+          "name": "Тип поверхности",
+          "kind": "qualitative",
+          "values": [
+            "Матовая"
+          ],
+          "required": true,
+          "level_define": true
+        },
+        {
+          "name": "Возможность двусторонней печати",
+          "kind": "qualitative",
+          "values": [
+            "Да"
+          ],
+          "required": true
+        },
+        {
+          "name": "Совместимость с лазерной печатью",
+          "kind": "qualitative",
+          "values": [
+            "Лазерная"
+          ],
+          "required": true
+        },
+        {
+          "name": "Совместимость со струйной печатью",
+          "kind": "qualitative",
+          "values": [
+            "Струйная"
+          ],
+          "required": true
+        },
+        {
+          "name": "Толщина листа",
+          "kind": "quantitative",
+          "unit": "мкм",
+          "values": [
+            "2"
+          ],
+          "required": false
+        }
+      ]
+    },
+    {
+      "code": "17.12.14.129-TEST0004",
+      "name": "Бумага для офисной техники белая A4 80 г/м² 500 листов, матовая",
+      "okpd2": "17.12.14.129",
+      "unit": "пач",
+      "characteristics": [
+        {
+          "name": "Формат",
+          "kind": "qualitative",
+          "values": [
+            "A4"
+          ],
+          "required": true,
+          "level_define": true
+        },
+        {
+          "name": "Масса бумаги площадью 1 м2",
+          "kind": "quantitative",
+          "unit": "г/м2",
+          "values": [
+            "80"
+          ],
+          "required": true,
+          "level_define": true
+        },
+        {
+          "name": "Количество листов в пачке",
+          "kind": "quantitative",
+          "unit": "шт",
+          "values": [
+            "500"
+          ],
+          "required": true,
+          "level_define": true
+        },
+        {
+          "name": "Белизна по CIE",
+          "kind": "quantitative",
+          "unit": "%",
+          "values": [
+            "161-165"
+          ],
+          "required": true
+        },
+        {
+          "name": "Непрозрачность",
+          "kind": "quantitative",
+          "unit": "%",
+          "values": [
+            "94-96"
+          ],
+          "required": true
+        },
+        {
+          "name": "Тип поверхности",
+          "kind": "qualitative",
+          "values": [
+            "Матовая"
+          ],
+          "required": true,
+          "level_define": true
+        },
+        {
+          "name": "Возможность двусторонней печати",
+          "kind": "qualitative",
+          "values": [
+            "Да"
+          ],
+          "required": true
+        },
+        {
+          "name": "Совместимость с лазерной печатью",
+          "kind": "qualitative",
+          "values": [
+            "Лазерная"
+          ],
+          "required": true
+        },
+        {
+          "name": "Совместимость со струйной печатью",
+          "kind": "qualitative",
+          "values": [
+            "Струйная"
+          ],
+          "required": true
+        },
+        {
+          "name": "Толщина листа",
+          "kind": "quantitative",
+          "unit": "мкм",
+          "values": [
+            "2"
+          ],
+          "required": false
+        }
+      ]
+    },
+    {
+      "code": "17.12.14.129-TEST0005",
+      "name": "Бумага для офисной техники белая A4 80 г/м² 500 листов, матовая",
+      "okpd2": "17.12.14.129",
+      "unit": "пач",
+      "characteristics": [
+        {
+          "name": "Формат",
+          "kind": "qualitative",
+          "values": [
+            "A4"
+          ],
+          "required": true,
+          "level_define": true
+        },
+        {
+          "name": "Масса бумаги площадью 1 м2",
+          "kind": "quantitative",
+          "unit": "г/м2",
+          "values": [
+            "80"
+          ],
+          "required": true,
+          "level_define": true
+        },
+        {
+          "name": "Количество листов в пачке",
+          "kind": "quantitative",
+          "unit": "шт",
+          "values": [
+            "500"
+          ],
+          "required": true,
+          "level_define": true
+        },
+        {
+          "name": "Белизна по CIE",
+          "kind": "quantitative",
+          "unit": "%",
+          "values": [
+            "166-170"
+          ],
+          "required": true
+        },
+        {
+          "name": "Непрозрачность",
+          "kind": "quantitative",
+          "unit": "%",
+          "values": [
+            "94-96"
+          ],
+          "required": true
+        },
+        {
+          "name": "Тип поверхности",
+          "kind": "qualitative",
+          "values": [
+            "Матовая"
+          ],
+          "required": true,
+          "level_define": true
+        },
+        {
+          "name": "Возможность двусторонней печати",
+          "kind": "qualitative",
+          "values": [
+            "Да"
+          ],
+          "required": true
+        },
+        {
+          "name": "Совместимость с лазерной печатью",
+          "kind": "qualitative",
+          "values": [
+            "Лазерная"
+          ],
+          "required": true
+        },
+        {
+          "name": "Совместимость со струйной печатью",
+          "kind": "qualitative",
+          "values": [
+            "Струйная"
+          ],
+          "required": true
+        },
+        {
+          "name": "Толщина листа",
+          "kind": "quantitative",
+          "unit": "мкм",
+          "values": [
+            "2"
+          ],
+          "required": false
+        }
+      ]
+    },
+    {
+      "code": "17.12.14.129-TEST0006",
+      "name": "Бумага для офисной техники белая A4 90 г/м² 500 листов, матовая",
+      "okpd2": "17.12.14.129",
+      "unit": "пач",
+      "characteristics": [
+        {
+          "name": "Формат",
+          "kind": "qualitative",
+          "values": [
+            "A4"
+          ],
+          "required": true,
+          "level_define": true
+        },
+        {
+          "name": "Масса бумаги площадью 1 м2",
+          "kind": "quantitative",
+          "unit": "г/м2",
+          "values": [
+            "90"
+          ],
+          "required": true,
+          "level_define": true
+        },
+        {
+          "name": "Количество листов в пачке",
+          "kind": "quantitative",
+          "unit": "шт",
+          "values": [
+            "500"
+          ],
+          "required": true,
+          "level_define": true
+        },
+        {
+          "name": "Белизна по CIE",
+          "kind": "quantitative",
+          "unit": "%",
+          "values": [
+            "146-155"
+          ],
+          "required": true
+        },
+        {
+          "name": "Непрозрачность",
+          "kind": "quantitative",
+          "unit": "%",
+          "values": [
+            "94-96"
+          ],
+          "required": true
+        },
+        {
+          "name": "Тип поверхности",
+          "kind": "qualitative",
+          "values": [
+            "Матовая"
+          ],
+          "required": true,
+          "level_define": true
+        },
+        {
+          "name": "Возможность двусторонней печати",
+          "kind": "qualitative",
+          "values": [
+            "Да"
+          ],
+          "required": true
+        },
+        {
+          "name": "Совместимость с лазерной печатью",
+          "kind": "qualitative",
+          "values": [
+            "Лазерная"
+          ],
+          "required": true
+        },
+        {
+          "name": "Совместимость со струйной печатью",
+          "kind": "qualitative",
+          "values": [
+            "Струйная"
+          ],
+          "required": true
+        },
+        {
+          "name": "Толщина листа",
+          "kind": "quantitative",
+          "unit": "мкм",
+          "values": [
+            "2"
+          ],
+          "required": false
+        }
+      ]
+    },
+    {
+      "code": "17.12.14.129-TEST0007",
+      "name": "Бумага для офисной техники белая A4 90 г/м² 500 листов, матовая",
+      "okpd2": "17.12.14.129",
+      "unit": "пач",
+      "characteristics": [
+        {
+          "name": "Формат",
+          "kind": "qualitative",
+          "values": [
+            "A4"
+          ],
+          "required": true,
+          "level_define": true
+        },
+        {
+          "name": "Масса бумаги площадью 1 м2",
+          "kind": "quantitative",
+          "unit": "г/м2",
+          "values": [
+            "90"
+          ],
+          "required": true,
+          "level_define": true
+        },
+        {
+          "name": "Количество листов в пачке",
+          "kind": "quantitative",
+          "unit": "шт",
+          "values": [
+            "500"
+          ],
+          "required": true,
+          "level_define": true
+        },
+        {
+          "name": "Белизна по CIE",
+          "kind": "quantitative",
+          "unit": "%",
+          "values": [
+            "156-160"
+          ],
+          "required": true
+        },
+        {
+          "name": "Непрозрачность",
+          "kind": "quantitative",
+          "unit": "%",
+          "values": [
+            "94-96"
+          ],
+          "required": true
+        },
+        {
+          "name": "Тип поверхности",
+          "kind": "qualitative",
+          "values": [
+            "Матовая"
+          ],
+          "required": true,
+          "level_define": true
+        },
+        {
+          "name": "Возможность двусторонней печати",
+          "kind": "qualitative",
+          "values": [
+            "Да"
+          ],
+          "required": true
+        },
+        {
+          "name": "Совместимость с лазерной печатью",
+          "kind": "qualitative",
+          "values": [
+            "Лазерная"
+          ],
+          "required": true
+        },
+        {
+          "name": "Совместимость со струйной печатью",
+          "kind": "qualitative",
+          "values": [
+            "Струйная"
+          ],
+          "required": true
+        },
+        {
+          "name": "Толщина листа",
+          "kind": "quantitative",
+          "unit": "мкм",
+          "values": [
+            "2"
+          ],
+          "required": false
+        }
+      ]
+    },
+    {
+      "code": "17.12.14.129-TEST0008",
+      "name": "Бумага для офисной техники белая A4 90 г/м² 250 листов, матовая",
+      "okpd2": "17.12.14.129",
+      "unit": "пач",
+      "characteristics": [
+        {
+          "name": "Формат",
+          "kind": "qualitative",
+          "values": [
+            "A4"
+          ],
+          "required": true,
+          "level_define": true
+        },
+        {
+          "name": "Масса бумаги площадью 1 м2",
+          "kind": "quantitative",
+          "unit": "г/м2",
+          "values": [
+            "90"
+          ],
+          "required": true,
+          "level_define": true
+        },
+        {
+          "name": "Количество листов в пачке",
+          "kind": "quantitative",
+          "unit": "шт",
+          "values": [
+            "250"
+          ],
+          "required": true,
+          "level_define": true
+        },
+        {
+          "name": "Белизна по CIE",
+          "kind": "quantitative",
+          "unit": "%",
+          "values": [
+            "156-160"
+          ],
+          "required": true
+        },
+        {
+          "name": "Непрозрачность",
+          "kind": "quantitative",
+          "unit": "%",
+          "values": [
+            "94-96"
+          ],
+          "required": true
+        },
+        {
+          "name": "Тип поверхности",
+          "kind": "qualitative",
+          "values": [
+            "Матовая"
+          ],
+          "required": true,
+          "level_define": true
+        },
+        {
+          "name": "Возможность двусторонней печати",
+          "kind": "qualitative",
+          "values": [
+            "Да"
+          ],
+          "required": true
+        },
+        {
+          "name": "Совместимость с лазерной печатью",
+          "kind": "qualitative",
+          "values": [
+            "Лазерная"
+          ],
+          "required": true
+        },
+        {
+          "name": "Совместимость со струйной печатью",
+          "kind": "qualitative",
+          "values": [
+            "Струйная"
+          ],
+          "required": true
+        },
+        {
+          "name": "Толщина листа",
+          "kind": "quantitative",
+          "unit": "мкм",
+          "values": [
+            "2"
+          ],
+          "required": false
+        }
+      ]
+    },
+    {
+      "code": "17.12.14.129-TEST0009",
+      "name": "Бумага для офисной техники белая A4 90 г/м² 500 листов, матовая",
+      "okpd2": "17.12.14.129",
+      "unit": "пач",
+      "characteristics": [
+        {
+          "name": "Формат",
+          "kind": "qualitative",
+          "values": [
+            "A4"
+          ],
+          "required": true,
+          "level_define": true
+        },
+        {
+          "name": "Масса бумаги площадью 1 м2",
+          "kind": "quantitative",
+          "unit": "г/м2",
+          "values": [
+            "90"
+          ],
+          "required": true,
+          "level_define": true
+        },
+        {
+          "name": "Количество листов в пачке",
+          "kind": "quantitative",
+          "unit": "шт",
+          "values": [
+            "500"
+          ],
+          "required": true,
+          "level_define": true
+        },
+        {
+          "name": "Белизна по CIE",
+          "kind": "quantitative",
+          "unit": "%",
+          "values": [
+            "161-165"
+          ],
+          "required": true
+        },
+        {
+          "name": "Непрозрачность",
+          "kind": "quantitative",
+          "unit": "%",
+          "values": [
+            "96-98"
+          ],
+          "required": true
+        },
+        {
+          "name": "Тип поверхности",
+          "kind": "qualitative",
+          "values": [
+            "Матовая"
+          ],
+          "required": true,
+          "level_define": true
+        },
+        {
+          "name": "Возможность двусторонней печати",
+          "kind": "qualitative",
+          "values": [
+            "Да"
+          ],
+          "required": true
+        },
+        {
+          "name": "Совместимость с лазерной печатью",
+          "kind": "qualitative",
+          "values": [
+            "Лазерная"
+          ],
+          "required": true
+        },
+        {
+          "name": "Совместимость со струйной печатью",
+          "kind": "qualitative",
+          "values": [
+            "Струйная"
+          ],
+          "required": true
+        },
+        {
+          "name": "Толщина листа",
+          "kind": "quantitative",
+          "unit": "мкм",
+          "values": [
+            "2"
+          ],
+          "required": false
+        }
+      ]
+    },
+    {
+      "code": "17.12.14.129-TEST0010",
+      "name": "Бумага для офисной техники белая A4 90 г/м² 500 листов, матовая",
+      "okpd2": "17.12.14.129",
+      "unit": "пач",
+      "characteristics": [
+        {
+          "name": "Формат",
+          "kind": "qualitative",
+          "values": [
+            "A4"
+          ],
+          "required": true,
+          "level_define": true
+        },
+        {
+          "name": "Масса бумаги площадью 1 м2",
+          "kind": "quantitative",
+          "unit": "г/м2",
+          "values": [
+            "90"
+          ],
+          "required": true,
+          "level_define": true
+        },
+        {
+          "name": "Количество листов в пачке",
+          "kind": "quantitative",
+          "unit": "шт",
+          "values": [
+            "500"
+          ],
+          "required": true,
+          "level_define": true
+        },
+        {
+          "name": "Белизна по CIE",
+          "kind": "quantitative",
+          "unit": "%",
+          "values": [
+            "166-170"
+          ],
+          "required": true
+        },
+        {
+          "name": "Непрозрачность",
+          "kind": "quantitative",
+          "unit": "%",
+          "values": [
+            "96-98"
+          ],
+          "required": true
+        },
+        {
+          "name": "Тип поверхности",
+          "kind": "qualitative",
+          "values": [
+            "Матовая"
+          ],
+          "required": true,
+          "level_define": true
+        },
+        {
+          "name": "Возможность двусторонней печати",
+          "kind": "qualitative",
+          "values": [
+            "Да"
+          ],
+          "required": true
+        },
+        {
+          "name": "Совместимость с лазерной печатью",
+          "kind": "qualitative",
+          "values": [
+            "Лазерная"
+          ],
+          "required": true
+        },
+        {
+          "name": "Совместимость со струйной печатью",
+          "kind": "qualitative",
+          "values": [
+            "Струйная"
+          ],
+          "required": true
+        },
+        {
+          "name": "Толщина листа",
+          "kind": "quantitative",
+          "unit": "мкм",
+          "values": [
+            "2"
+          ],
+          "required": false
+        }
+      ]
+    },
+    {
+      "code": "17.12.14.129-TEST0011",
+      "name": "Бумага для офисной техники белая A4 100 г/м² 500 листов, матовая",
+      "okpd2": "17.12.14.129",
+      "unit": "пач",
+      "characteristics": [
+        {
+          "name": "Формат",
+          "kind": "qualitative",
+          "values": [
+            "A4"
+          ],
+          "required": true,
+          "level_define": true
+        },
+        {
+          "name": "Масса бумаги площадью 1 м2",
+          "kind": "quantitative",
+          "unit": "г/м2",
+          "values": [
+            "100"
+          ],
+          "required": true,
+          "level_define": true
+        },
+        {
+          "name": "Количество листов в пачке",
+          "kind": "quantitative",
+          "unit": "шт",
+          "values": [
+            "500"
+          ],
+          "required": true,
+          "level_define": true
+        },
+        {
+          "name": "Белизна по CIE",
+          "kind": "quantitative",
+          "unit": "%",
+          "values": [
+            "146-155"
+          ],
+          "required": true
+        },
+        {
+          "name": "Непрозрачность",
+          "kind": "quantitative",
+          "unit": "%",
+          "values": [
+            "96-98"
+          ],
+          "required": true
+        },
+        {
+          "name": "Тип поверхности",
+          "kind": "qualitative",
+          "values": [
+            "Матовая"
+          ],
+          "required": true,
+          "level_define": true
+        },
+        {
+          "name": "Возможность двусторонней печати",
+          "kind": "qualitative",
+          "values": [
+            "Да"
+          ],
+          "required": true
+        },
+        {
+          "name": "Совместимость с лазерной печатью",
+          "kind": "qualitative",
+          "values": [
+            "Лазерная"
+          ],
+          "required": true
+        },
+        {
+          "name": "Совместимость со струйной печатью",
+          "kind": "qualitative",
+          "values": [
+            "Струйная"
+          ],
+          "required": true
+        },
+        {
+          "name": "Толщина листа",
+          "kind": "quantitative",
+          "unit": "мкм",
+          "values": [
+            "2"
+          ],
+          "required": false
+        }
+      ]
+    },
+    {
+      "code": "17.12.14.129-TEST0012",
+      "name": "Бумага для офисной техники белая A4 100 г/м² 500 листов, матовая",
+      "okpd2": "17.12.14.129",
+      "unit": "пач",
+      "characteristics": [
+        {
+          "name": "Формат",
+          "kind": "qualitative",
+          "values": [
+            "A4"
+          ],
+          "required": true,
+          "level_define": true
+        },
+        {
+          "name": "Масса бумаги площадью 1 м2",
+          "kind": "quantitative",
+          "unit": "г/м2",
+          "values": [
+            "100"
+          ],
+          "required": true,
+          "level_define": true
+        },
+        {
+          "name": "Количество листов в пачке",
+          "kind": "quantitative",
+          "unit": "шт",
+          "values": [
+            "500"
+          ],
+          "required": true,
+          "level_define": true
+        },
+        {
+          "name": "Белизна по CIE",
+          "kind": "quantitative",
+          "unit": "%",
+          "values": [
+            "156-160"
+          ],
+          "required": true
+        },
+        {
+          "name": "Непрозрачность",
+          "kind": "quantitative",
+          "unit": "%",
+          "values": [
+            "96-98"
+          ],
+          "required": true
+        },
+        {
+          "name": "Тип поверхности",
+          "kind": "qualitative",
+          "values": [
+            "Матовая"
+          ],
+          "required": true,
+          "level_define": true
+        },
+        {
+          "name": "Возможность двусторонней печати",
+          "kind": "qualitative",
+          "values": [
+            "Да"
+          ],
+          "required": true
+        },
+        {
+          "name": "Совместимость с лазерной печатью",
+          "kind": "qualitative",
+          "values": [
+            "Лазерная"
+          ],
+          "required": true
+        },
+        {
+          "name": "Совместимость со струйной печатью",
+          "kind": "qualitative",
+          "values": [
+            "Струйная"
+          ],
+          "required": true
+        },
+        {
+          "name": "Толщина листа",
+          "kind": "quantitative",
+          "unit": "мкм",
+          "values": [
+            "2"
+          ],
+          "required": false
+        }
+      ]
+    },
+    {
+      "code": "17.12.14.129-TEST0013",
+      "name": "Бумага для офисной техники белая A4 100 г/м² 250 листов, матовая",
+      "okpd2": "17.12.14.129",
+      "unit": "пач",
+      "characteristics": [
+        {
+          "name": "Формат",
+          "kind": "qualitative",
+          "values": [
+            "A4"
+          ],
+          "required": true,
+          "level_define": true
+        },
+        {
+          "name": "Масса бумаги площадью 1 м2",
+          "kind": "quantitative",
+          "unit": "г/м2",
+          "values": [
+            "100"
+          ],
+          "required": true,
+          "level_define": true
+        },
+        {
+          "name": "Количество листов в пачке",
+          "kind": "quantitative",
+          "unit": "шт",
+          "values": [
+            "250"
+          ],
+          "required": true,
+          "level_define": true
+        },
+        {
+          "name": "Белизна по CIE",
+          "kind": "quantitative",
+          "unit": "%",
+          "values": [
+            "156-160"
+          ],
+          "required": true
+        },
+        {
+          "name": "Непрозрачность",
+          "kind": "quantitative",
+          "unit": "%",
+          "values": [
+            "96-98"
+          ],
+          "required": true
+        },
+        {
+          "name": "Тип поверхности",
+          "kind": "qualitative",
+          "values": [
+            "Матовая"
+          ],
+          "required": true,
+          "level_define": true
+        },
+        {
+          "name": "Возможность двусторонней печати",
+          "kind": "qualitative",
+          "values": [
+            "Да"
+          ],
+          "required": true
+        },
+        {
+          "name": "Совместимость с лазерной печатью",
+          "kind": "qualitative",
+          "values": [
+            "Лазерная"
+          ],
+          "required": true
+        },
+        {
+          "name": "Совместимость со струйной печатью",
+          "kind": "qualitative",
+          "values": [
+            "Струйная"
+          ],
+          "required": true
+        },
+        {
+          "name": "Толщина листа",
+          "kind": "quantitative",
+          "unit": "мкм",
+          "values": [
+            "2"
+          ],
+          "required": false
+        }
+      ]
+    },
+    {
+      "code": "17.12.14.129-TEST0014",
+      "name": "Бумага для офисной техники белая A4 100 г/м² 500 листов, матовая",
+      "okpd2": "17.12.14.129",
+      "unit": "пач",
+      "characteristics": [
+        {
+          "name": "Формат",
+          "kind": "qualitative",
+          "values": [
+            "A4"
+          ],
+          "required": true,
+          "level_define": true
+        },
+        {
+          "name": "Масса бумаги площадью 1 м2",
+          "kind": "quantitative",
+          "unit": "г/м2",
+          "values": [
+            "100"
+          ],
+          "required": true,
+          "level_define": true
+        },
+        {
+          "name": "Количество листов в пачке",
+          "kind": "quantitative",
+          "unit": "шт",
+          "values": [
+            "500"
+          ],
+          "required": true,
+          "level_define": true
+        },
+        {
+          "name": "Белизна по CIE",
+          "kind": "quantitative",
+          "unit": "%",
+          "values": [
+            "161-165"
+          ],
+          "required": true
+        },
+        {
+          "name": "Непрозрачность",
+          "kind": "quantitative",
+          "unit": "%",
+          "values": [
+            "96-98"
+          ],
+          "required": true
+        },
+        {
+          "name": "Тип поверхности",
+          "kind": "qualitative",
+          "values": [
+            "Матовая"
+          ],
+          "required": true,
+          "level_define": true
+        },
+        {
+          "name": "Возможность двусторонней печати",
+          "kind": "qualitative",
+          "values": [
+            "Да"
+          ],
+          "required": true
+        },
+        {
+          "name": "Совместимость с лазерной печатью",
+          "kind": "qualitative",
+          "values": [
+            "Лазерная"
+          ],
+          "required": true
+        },
+        {
+          "name": "Совместимость со струйной печатью",
+          "kind": "qualitative",
+          "values": [
+            "Струйная"
+          ],
+          "required": true
+        },
+        {
+          "name": "Толщина листа",
+          "kind": "quantitative",
+          "unit": "мкм",
+          "values": [
+            "2"
+          ],
+          "required": false
+        }
+      ]
+    },
+    {
+      "code": "17.12.14.129-TEST0015",
+      "name": "Бумага для офисной техники белая A4 100 г/м² 500 листов, матовая",
+      "okpd2": "17.12.14.129",
+      "unit": "пач",
+      "characteristics": [
+        {
+          "name": "Формат",
+          "kind": "qualitative",
+          "values": [
+            "A4"
+          ],
+          "required": true,
+          "level_define": true
+        },
+        {
+          "name": "Масса бумаги площадью 1 м2",
+          "kind": "quantitative",
+          "unit": "г/м2",
+          "values": [
+            "100"
+          ],
+          "required": true,
+          "level_define": true
+        },
+        {
+          "name": "Количество листов в пачке",
+          "kind": "quantitative",
+          "unit": "шт",
+          "values": [
+            "500"
+          ],
+          "required": true,
+          "level_define": true
+        },
+        {
+          "name": "Белизна по CIE",
+          "kind": "quantitative",
+          "unit": "%",
+          "values": [
+            "166-170"
+          ],
+          "required": true
+        },
+        {
+          "name": "Непрозрачность",
+          "kind": "quantitative",
+          "unit": "%",
+          "values": [
+            "98-99"
+          ],
+          "required": true
+        },
+        {
+          "name": "Тип поверхности",
+          "kind": "qualitative",
+          "values": [
+            "Матовая"
+          ],
+          "required": true,
+          "level_define": true
+        },
+        {
+          "name": "Возможность двусторонней печати",
+          "kind": "qualitative",
+          "values": [
+            "Да"
+          ],
+          "required": true
+        },
+        {
+          "name": "Совместимость с лазерной печатью",
+          "kind": "qualitative",
+          "values": [
+            "Лазерная"
+          ],
+          "required": true
+        },
+        {
+          "name": "Совместимость со струйной печатью",
+          "kind": "qualitative",
+          "values": [
+            "Струйная"
+          ],
+          "required": true
+        },
+        {
+          "name": "Толщина листа",
+          "kind": "quantitative",
+          "unit": "мкм",
+          "values": [
+            "2"
+          ],
+          "required": false
+        }
+      ]
+    },
+    {
+      "code": "17.12.14.129-TEST0016",
+      "name": "Бумага для офисной техники белая A3 80 г/м² 500 листов, матовая",
+      "okpd2": "17.12.14.129",
+      "unit": "пач",
+      "characteristics": [
+        {
+          "name": "Формат",
+          "kind": "qualitative",
+          "values": [
+            "A3"
+          ],
+          "required": true,
+          "level_define": true
+        },
+        {
+          "name": "Масса бумаги площадью 1 м2",
+          "kind": "quantitative",
+          "unit": "г/м2",
+          "values": [
+            "80"
+          ],
+          "required": true,
+          "level_define": true
+        },
+        {
+          "name": "Количество листов в пачке",
+          "kind": "quantitative",
+          "unit": "шт",
+          "values": [
+            "500"
+          ],
+          "required": true,
+          "level_define": true
+        },
+        {
+          "name": "Белизна по CIE",
+          "kind": "quantitative",
+          "unit": "%",
+          "values": [
+            "146-155"
+          ],
+          "required": true
+        },
+        {
+          "name": "Непрозрачность",
+          "kind": "quantitative",
+          "unit": "%",
+          "values": [
+            "92-94"
+          ],
+          "required": true
+        },
+        {
+          "name": "Тип поверхности",
+          "kind": "qualitative",
+          "values": [
+            "Матовая"
+          ],
+          "required": true,
+          "level_define": true
+        },
+        {
+          "name": "Возможность двусторонней печати",
+          "kind": "qualitative",
+          "values": [
+            "Да"
+          ],
+          "required": true
+        },
+        {
+          "name": "Совместимость с лазерной печатью",
+          "kind": "qualitative",
+          "values": [
+            "Лазерная"
+          ],
+          "required": true
+        },
+        {
+          "name": "Совместимость со струйной печатью",
+          "kind": "qualitative",
+          "values": [
+            "Струйная"
+          ],
+          "required": true
+        },
+        {
+          "name": "Толщина листа",
+          "kind": "quantitative",
+          "unit": "мкм",
+          "values": [
+            "2"
+          ],
+          "required": false
+        }
+      ]
+    },
+    {
+      "code": "17.12.14.129-TEST0017",
+      "name": "Бумага для офисной техники белая A3 80 г/м² 250 листов, матовая",
+      "okpd2": "17.12.14.129",
+      "unit": "пач",
+      "characteristics": [
+        {
+          "name": "Формат",
+          "kind": "qualitative",
+          "values": [
+            "A3"
+          ],
+          "required": true,
+          "level_define": true
+        },
+        {
+          "name": "Масса бумаги площадью 1 м2",
+          "kind": "quantitative",
+          "unit": "г/м2",
+          "values": [
+            "80"
+          ],
+          "required": true,
+          "level_define": true
+        },
+        {
+          "name": "Количество листов в пачке",
+          "kind": "quantitative",
+          "unit": "шт",
+          "values": [
+            "250"
+          ],
+          "required": true,
+          "level_define": true
+        },
+        {
+          "name": "Белизна по CIE",
+          "kind": "quantitative",
+          "unit": "%",
+          "values": [
+            "156-160"
+          ],
+          "required": true
+        },
+        {
+          "name": "Непрозрачность",
+          "kind": "quantitative",
+          "unit": "%",
+          "values": [
+            "92-94"
+          ],
+          "required": true
+        },
+        {
+          "name": "Тип поверхности",
+          "kind": "qualitative",
+          "values": [
+            "Матовая"
+          ],
+          "required": true,
+          "level_define": true
+        },
+        {
+          "name": "Возможность двусторонней печати",
+          "kind": "qualitative",
+          "values": [
+            "Да"
+          ],
+          "required": true
+        },
+        {
+          "name": "Совместимость с лазерной печатью",
+          "kind": "qualitative",
+          "values": [
+            "Лазерная"
+          ],
+          "required": true
+        },
+        {
+          "name": "Совместимость со струйной печатью",
+          "kind": "qualitative",
+          "values": [
+            "Струйная"
+          ],
+          "required": true
+        },
+        {
+          "name": "Толщина листа",
+          "kind": "quantitative",
+          "unit": "мкм",
+          "values": [
+            "2"
+          ],
+          "required": false
+        }
+      ]
+    },
+    {
+      "code": "17.12.14.129-TEST0018",
+      "name": "Бумага для офисной техники белая A3 80 г/м² 500 листов, матовая",
+      "okpd2": "17.12.14.129",
+      "unit": "пач",
+      "characteristics": [
+        {
+          "name": "Формат",
+          "kind": "qualitative",
+          "values": [
+            "A3"
+          ],
+          "required": true,
+          "level_define": true
+        },
+        {
+          "name": "Масса бумаги площадью 1 м2",
+          "kind": "quantitative",
+          "unit": "г/м2",
+          "values": [
+            "80"
+          ],
+          "required": true,
+          "level_define": true
+        },
+        {
+          "name": "Количество листов в пачке",
+          "kind": "quantitative",
+          "unit": "шт",
+          "values": [
+            "500"
+          ],
+          "required": true,
+          "level_define": true
+        },
+        {
+          "name": "Белизна по CIE",
+          "kind": "quantitative",
+          "unit": "%",
+          "values": [
+            "161-165"
+          ],
+          "required": true
+        },
+        {
+          "name": "Непрозрачность",
+          "kind": "quantitative",
+          "unit": "%",
+          "values": [
+            "94-96"
+          ],
+          "required": true
+        },
+        {
+          "name": "Тип поверхности",
+          "kind": "qualitative",
+          "values": [
+            "Матовая"
+          ],
+          "required": true,
+          "level_define": true
+        },
+        {
+          "name": "Возможность двусторонней печати",
+          "kind": "qualitative",
+          "values": [
+            "Да"
+          ],
+          "required": true
+        },
+        {
+          "name": "Совместимость с лазерной печатью",
+          "kind": "qualitative",
+          "values": [
+            "Лазерная"
+          ],
+          "required": true
+        },
+        {
+          "name": "Совместимость со струйной печатью",
+          "kind": "qualitative",
+          "values": [
+            "Струйная"
+          ],
+          "required": true
+        },
+        {
+          "name": "Толщина листа",
+          "kind": "quantitative",
+          "unit": "мкм",
+          "values": [
+            "2"
+          ],
+          "required": false
+        }
+      ]
+    },
+    {
+      "code": "17.12.14.129-TEST0019",
+      "name": "Бумага для офисной техники белая A3 90 г/м² 500 листов, матовая",
+      "okpd2": "17.12.14.129",
+      "unit": "пач",
+      "characteristics": [
+        {
+          "name": "Формат",
+          "kind": "qualitative",
+          "values": [
+            "A3"
+          ],
+          "required": true,
+          "level_define": true
+        },
+        {
+          "name": "Масса бумаги площадью 1 м2",
+          "kind": "quantitative",
+          "unit": "г/м2",
+          "values": [
+            "90"
+          ],
+          "required": true,
+          "level_define": true
+        },
+        {
+          "name": "Количество листов в пачке",
+          "kind": "quantitative",
+          "unit": "шт",
+          "values": [
+            "500"
+          ],
+          "required": true,
+          "level_define": true
+        },
+        {
+          "name": "Белизна по CIE",
+          "kind": "quantitative",
+          "unit": "%",
+          "values": [
+            "146-155"
+          ],
+          "required": true
+        },
+        {
+          "name": "Непрозрачность",
+          "kind": "quantitative",
+          "unit": "%",
+          "values": [
+            "94-96"
+          ],
+          "required": true
+        },
+        {
+          "name": "Тип поверхности",
+          "kind": "qualitative",
+          "values": [
+            "Матовая"
+          ],
+          "required": true,
+          "level_define": true
+        },
+        {
+          "name": "Возможность двусторонней печати",
+          "kind": "qualitative",
+          "values": [
+            "Да"
+          ],
+          "required": true
+        },
+        {
+          "name": "Совместимость с лазерной печатью",
+          "kind": "qualitative",
+          "values": [
+            "Лазерная"
+          ],
+          "required": true
+        },
+        {
+          "name": "Совместимость со струйной печатью",
+          "kind": "qualitative",
+          "values": [
+            "Струйная"
+          ],
+          "required": true
+        },
+        {
+          "name": "Толщина листа",
+          "kind": "quantitative",
+          "unit": "мкм",
+          "values": [
+            "2"
+          ],
+          "required": false
+        }
+      ]
+    },
+    {
+      "code": "17.12.14.129-TEST0020",
+      "name": "Бумага для офисной техники белая A3 90 г/м² 500 листов, матовая",
+      "okpd2": "17.12.14.129",
+      "unit": "пач",
+      "characteristics": [
+        {
+          "name": "Формат",
+          "kind": "qualitative",
+          "values": [
+            "A3"
+          ],
+          "required": true,
+          "level_define": true
+        },
+        {
+          "name": "Масса бумаги площадью 1 м2",
+          "kind": "quantitative",
+          "unit": "г/м2",
+          "values": [
+            "90"
+          ],
+          "required": true,
+          "level_define": true
+        },
+        {
+          "name": "Количество листов в пачке",
+          "kind": "quantitative",
+          "unit": "шт",
+          "values": [
+            "500"
+          ],
+          "required": true,
+          "level_define": true
+        },
+        {
+          "name": "Белизна по CIE",
+          "kind": "quantitative",
+          "unit": "%",
+          "values": [
+            "156-160"
+          ],
+          "required": true
+        },
+        {
+          "name": "Непрозрачность",
+          "kind": "quantitative",
+          "unit": "%",
+          "values": [
+            "94-96"
+          ],
+          "required": true
+        },
+        {
+          "name": "Тип поверхности",
+          "kind": "qualitative",
+          "values": [
+            "Матовая"
+          ],
+          "required": true,
+          "level_define": true
+        },
+        {
+          "name": "Возможность двусторонней печати",
+          "kind": "qualitative",
+          "values": [
+            "Да"
+          ],
+          "required": true
+        },
+        {
+          "name": "Совместимость с лазерной печатью",
+          "kind": "qualitative",
+          "values": [
+            "Лазерная"
+          ],
+          "required": true
+        },
+        {
+          "name": "Совместимость со струйной печатью",
+          "kind": "qualitative",
+          "values": [
+            "Струйная"
+          ],
+          "required": true
+        },
+        {
+          "name": "Толщина листа",
+          "kind": "quantitative",
+          "unit": "мкм",
+          "values": [
+            "2"
+          ],
+          "required": false
+        }
+      ]
+    },
+    {
+      "code": "17.12.14.129-TEST0021",
+      "name": "Бумага для офисной техники белая A3 90 г/м² 250 листов, матовая",
+      "okpd2": "17.12.14.129",
+      "unit": "пач",
+      "characteristics": [
+        {
+          "name": "Формат",
+          "kind": "qualitative",
+          "values": [
+            "A3"
+          ],
+          "required": true,
+          "level_define": true
+        },
+        {
+          "name": "Масса бумаги площадью 1 м2",
+          "kind": "quantitative",
+          "unit": "г/м2",
+          "values": [
+            "90"
+          ],
+          "required": true,
+          "level_define": true
+        },
+        {
+          "name": "Количество листов в пачке",
+          "kind": "quantitative",
+          "unit": "шт",
+          "values": [
+            "250"
+          ],
+          "required": true,
+          "level_define": true
+        },
+        {
+          "name": "Белизна по CIE",
+          "kind": "quantitative",
+          "unit": "%",
+          "values": [
+            "161-165"
+          ],
+          "required": true
+        },
+        {
+          "name": "Непрозрачность",
+          "kind": "quantitative",
+          "unit": "%",
+          "values": [
+            "96-98"
+          ],
+          "required": true
+        },
+        {
+          "name": "Тип поверхности",
+          "kind": "qualitative",
+          "values": [
+            "Матовая"
+          ],
+          "required": true,
+          "level_define": true
+        },
+        {
+          "name": "Возможность двусторонней печати",
+          "kind": "qualitative",
+          "values": [
+            "Да"
+          ],
+          "required": true
+        },
+        {
+          "name": "Совместимость с лазерной печатью",
+          "kind": "qualitative",
+          "values": [
+            "Лазерная"
+          ],
+          "required": true
+        },
+        {
+          "name": "Совместимость со струйной печатью",
+          "kind": "qualitative",
+          "values": [
+            "Струйная"
+          ],
+          "required": true
+        },
+        {
+          "name": "Толщина листа",
+          "kind": "quantitative",
+          "unit": "мкм",
+          "values": [
+            "2"
+          ],
+          "required": false
+        }
+      ]
+    },
+    {
+      "code": "17.12.14.129-TEST0022",
+      "name": "Бумага для офисной техники белая A3 90 г/м² 500 листов, матовая",
+      "okpd2": "17.12.14.129",
+      "unit": "пач",
+      "characteristics": [
+        {
+          "name": "Формат",
+          "kind": "qualitative",
+          "values": [
+            "A3"
+          ],
+          "required": true,
+          "level_define": true
+        },
+        {
+          "name": "Масса бумаги площадью 1 м2",
+          "kind": "quantitative",
+          "unit": "г/м2",
+          "values": [
+            "90"
+          ],
+          "required": true,
+          "level_define": true
+        },
+        {
+          "name": "Количество листов в пачке",
+          "kind": "quantitative",
+          "unit": "шт",
+          "values": [
+            "500"
+          ],
+          "required": true,
+          "level_define": true
+        },
+        {
+          "name": "Белизна по CIE",
+          "kind": "quantitative",
+          "unit": "%",
+          "values": [
+            "166-170"
+          ],
+          "required": true
+        },
+        {
+          "name": "Непрозрачность",
+          "kind": "quantitative",
+          "unit": "%",
+          "values": [
+            "96-98"
+          ],
+          "required": true
+        },
+        {
+          "name": "Тип поверхности",
+          "kind": "qualitative",
+          "values": [
+            "Матовая"
+          ],
+          "required": true,
+          "level_define": true
+        },
+        {
+          "name": "Возможность двусторонней печати",
+          "kind": "qualitative",
+          "values": [
+            "Да"
+          ],
+          "required": true
+        },
+        {
+          "name": "Совместимость с лазерной печатью",
+          "kind": "qualitative",
+          "values": [
+            "Лазерная"
+          ],
+          "required": true
+        },
+        {
+          "name": "Совместимость со струйной печатью",
+          "kind": "qualitative",
+          "values": [
+            "Струйная"
+          ],
+          "required": true
+        },
+        {
+          "name": "Толщина листа",
+          "kind": "quantitative",
+          "unit": "мкм",
+          "values": [
+            "2"
+          ],
+          "required": false
+        }
+      ]
+    },
+    {
+      "code": "17.12.14.129-TEST0023",
+      "name": "Бумага для офисной техники белая A3 100 г/м² 500 листов, матовая",
+      "okpd2": "17.12.14.129",
+      "unit": "пач",
+      "characteristics": [
+        {
+          "name": "Формат",
+          "kind": "qualitative",
+          "values": [
+            "A3"
+          ],
+          "required": true,
+          "level_define": true
+        },
+        {
+          "name": "Масса бумаги площадью 1 м2",
+          "kind": "quantitative",
+          "unit": "г/м2",
+          "values": [
+            "100"
+          ],
+          "required": true,
+          "level_define": true
+        },
+        {
+          "name": "Количество листов в пачке",
+          "kind": "quantitative",
+          "unit": "шт",
+          "values": [
+            "500"
+          ],
+          "required": true,
+          "level_define": true
+        },
+        {
+          "name": "Белизна по CIE",
+          "kind": "quantitative",
+          "unit": "%",
+          "values": [
+            "146-155"
+          ],
+          "required": true
+        },
+        {
+          "name": "Непрозрачность",
+          "kind": "quantitative",
+          "unit": "%",
+          "values": [
+            "96-98"
+          ],
+          "required": true
+        },
+        {
+          "name": "Тип поверхности",
+          "kind": "qualitative",
+          "values": [
+            "Матовая"
+          ],
+          "required": true,
+          "level_define": true
+        },
+        {
+          "name": "Возможность двусторонней печати",
+          "kind": "qualitative",
+          "values": [
+            "Да"
+          ],
+          "required": true
+        },
+        {
+          "name": "Совместимость с лазерной печатью",
+          "kind": "qualitative",
+          "values": [
+            "Лазерная"
+          ],
+          "required": true
+        },
+        {
+          "name": "Совместимость со струйной печатью",
+          "kind": "qualitative",
+          "values": [
+            "Струйная"
+          ],
+          "required": true
+        },
+        {
+          "name": "Толщина листа",
+          "kind": "quantitative",
+          "unit": "мкм",
+          "values": [
+            "2"
+          ],
+          "required": false
+        }
+      ]
+    },
+    {
+      "code": "17.12.14.129-TEST0024",
+      "name": "Бумага для офисной техники белая A3 100 г/м² 500 листов, матовая",
+      "okpd2": "17.12.14.129",
+      "unit": "пач",
+      "characteristics": [
+        {
+          "name": "Формат",
+          "kind": "qualitative",
+          "values": [
+            "A3"
+          ],
+          "required": true,
+          "level_define": true
+        },
+        {
+          "name": "Масса бумаги площадью 1 м2",
+          "kind": "quantitative",
+          "unit": "г/м2",
+          "values": [
+            "100"
+          ],
+          "required": true,
+          "level_define": true
+        },
+        {
+          "name": "Количество листов в пачке",
+          "kind": "quantitative",
+          "unit": "шт",
+          "values": [
+            "500"
+          ],
+          "required": true,
+          "level_define": true
+        },
+        {
+          "name": "Белизна по CIE",
+          "kind": "quantitative",
+          "unit": "%",
+          "values": [
+            "156-160"
+          ],
+          "required": true
+        },
+        {
+          "name": "Непрозрачность",
+          "kind": "quantitative",
+          "unit": "%",
+          "values": [
+            "96-98"
+          ],
+          "required": true
+        },
+        {
+          "name": "Тип поверхности",
+          "kind": "qualitative",
+          "values": [
+            "Матовая"
+          ],
+          "required": true,
+          "level_define": true
+        },
+        {
+          "name": "Возможность двусторонней печати",
+          "kind": "qualitative",
+          "values": [
+            "Да"
+          ],
+          "required": true
+        },
+        {
+          "name": "Совместимость с лазерной печатью",
+          "kind": "qualitative",
+          "values": [
+            "Лазерная"
+          ],
+          "required": true
+        },
+        {
+          "name": "Совместимость со струйной печатью",
+          "kind": "qualitative",
+          "values": [
+            "Струйная"
+          ],
+          "required": true
+        },
+        {
+          "name": "Толщина листа",
+          "kind": "quantitative",
+          "unit": "мкм",
+          "values": [
+            "2"
+          ],
+          "required": false
+        }
+      ]
+    },
+    {
+      "code": "17.12.14.129-TEST0025",
+      "name": "Бумага для офисной техники белая A3 100 г/м² 250 листов, матовая",
+      "okpd2": "17.12.14.129",
+      "unit": "пач",
+      "characteristics": [
+        {
+          "name": "Формат",
+          "kind": "qualitative",
+          "values": [
+            "A3"
+          ],
+          "required": true,
+          "level_define": true
+        },
+        {
+          "name": "Масса бумаги площадью 1 м2",
+          "kind": "quantitative",
+          "unit": "г/м2",
+          "values": [
+            "100"
+          ],
+          "required": true,
+          "level_define": true
+        },
+        {
+          "name": "Количество листов в пачке",
+          "kind": "quantitative",
+          "unit": "шт",
+          "values": [
+            "250"
+          ],
+          "required": true,
+          "level_define": true
+        },
+        {
+          "name": "Белизна по CIE",
+          "kind": "quantitative",
+          "unit": "%",
+          "values": [
+            "161-165"
+          ],
+          "required": true
+        },
+        {
+          "name": "Непрозрачность",
+          "kind": "quantitative",
+          "unit": "%",
+          "values": [
+            "96-98"
+          ],
+          "required": true
+        },
+        {
+          "name": "Тип поверхности",
+          "kind": "qualitative",
+          "values": [
+            "Матовая"
+          ],
+          "required": true,
+          "level_define": true
+        },
+        {
+          "name": "Возможность двусторонней печати",
+          "kind": "qualitative",
+          "values": [
+            "Да"
+          ],
+          "required": true
+        },
+        {
+          "name": "Совместимость с лазерной печатью",
+          "kind": "qualitative",
+          "values": [
+            "Лазерная"
+          ],
+          "required": true
+        },
+        {
+          "name": "Совместимость со струйной печатью",
+          "kind": "qualitative",
+          "values": [
+            "Струйная"
+          ],
+          "required": true
+        },
+        {
+          "name": "Толщина листа",
+          "kind": "quantitative",
+          "unit": "мкм",
+          "values": [
+            "2"
+          ],
+          "required": false
+        }
+      ]
+    },
+    {
+      "code": "17.12.14.129-TEST0026",
+      "name": "Бумага для офисной техники белая A3 100 г/м² 500 листов, матовая",
+      "okpd2": "17.12.14.129",
+      "unit": "пач",
+      "characteristics": [
+        {
+          "name": "Формат",
+          "kind": "qualitative",
+          "values": [
+            "A3"
+          ],
+          "required": true,
+          "level_define": true
+        },
+        {
+          "name": "Масса бумаги площадью 1 м2",
+          "kind": "quantitative",
+          "unit": "г/м2",
+          "values": [
+            "100"
+          ],
+          "required": true,
+          "level_define": true
+        },
+        {
+          "name": "Количество листов в пачке",
+          "kind": "quantitative",
+          "unit": "шт",
+          "values": [
+            "500"
+          ],
+          "required": true,
+          "level_define": true
+        },
+        {
+          "name": "Белизна по CIE",
+          "kind": "quantitative",
+          "unit": "%",
+          "values": [
+            "166-170"
+          ],
+          "required": true
+        },
+        {
+          "name": "Непрозрачность",
+          "kind": "quantitative",
+          "unit": "%",
+          "values": [
+            "98-99"
+          ],
+          "required": true
+        },
+        {
+          "name": "Тип поверхности",
+          "kind": "qualitative",
+          "values": [
+            "Матовая"
+          ],
+          "required": true,
+          "level_define": true
+        },
+        {
+          "name": "Возможность двусторонней печати",
+          "kind": "qualitative",
+          "values": [
+            "Да"
+          ],
+          "required": true
+        },
+        {
+          "name": "Совместимость с лазерной печатью",
+          "kind": "qualitative",
+          "values": [
+            "Лазерная"
+          ],
+          "required": true
+        },
+        {
+          "name": "Совместимость со струйной печатью",
+          "kind": "qualitative",
+          "values": [
+            "Струйная"
+          ],
+          "required": true
+        },
+        {
+          "name": "Толщина листа",
+          "kind": "quantitative",
+          "unit": "мкм",
+          "values": [
+            "2"
+          ],
+          "required": false
+        }
+      ]
+    },
+    {
+      "code": "17.12.14.129-TEST0027",
+      "name": "Бумага для офисной техники белая A4 90 г/м² 500 листов, глянцевая",
+      "okpd2": "17.12.14.129",
+      "unit": "пач",
+      "characteristics": [
+        {
+          "name": "Формат",
+          "kind": "qualitative",
+          "values": [
+            "A4"
+          ],
+          "required": true,
+          "level_define": true
+        },
+        {
+          "name": "Масса бумаги площадью 1 м2",
+          "kind": "quantitative",
+          "unit": "г/м2",
+          "values": [
+            "90"
+          ],
+          "required": true,
+          "level_define": true
+        },
+        {
+          "name": "Количество листов в пачке",
+          "kind": "quantitative",
+          "unit": "шт",
+          "values": [
+            "500"
+          ],
+          "required": true,
+          "level_define": true
+        },
+        {
+          "name": "Белизна по CIE",
+          "kind": "quantitative",
+          "unit": "%",
+          "values": [
+            "161-165"
+          ],
+          "required": true
+        },
+        {
+          "name": "Непрозрачность",
+          "kind": "quantitative",
+          "unit": "%",
+          "values": [
+            "96-98"
+          ],
+          "required": true
+        },
+        {
+          "name": "Тип поверхности",
+          "kind": "qualitative",
+          "values": [
+            "Глянцевая"
+          ],
+          "required": true,
+          "level_define": true
+        },
+        {
+          "name": "Возможность двусторонней печати",
+          "kind": "qualitative",
+          "values": [
+            "Да"
+          ],
+          "required": true
+        },
+        {
+          "name": "Совместимость с лазерной печатью",
+          "kind": "qualitative",
+          "values": [
+            "Лазерная"
+          ],
+          "required": true
+        },
+        {
+          "name": "Совместимость со струйной печатью",
+          "kind": "qualitative",
+          "values": [
+            "Струйная"
+          ],
+          "required": true
+        },
+        {
+          "name": "Толщина листа",
+          "kind": "quantitative",
+          "unit": "мкм",
+          "values": [
+            "2"
+          ],
+          "required": false
+        }
+      ]
+    },
+    {
+      "code": "17.12.14.129-TEST0028",
+      "name": "Бумага для офисной техники белая A4 100 г/м² 500 листов, глянцевая",
+      "okpd2": "17.12.14.129",
+      "unit": "пач",
+      "characteristics": [
+        {
+          "name": "Формат",
+          "kind": "qualitative",
+          "values": [
+            "A4"
+          ],
+          "required": true,
+          "level_define": true
+        },
+        {
+          "name": "Масса бумаги площадью 1 м2",
+          "kind": "quantitative",
+          "unit": "г/м2",
+          "values": [
+            "100"
+          ],
+          "required": true,
+          "level_define": true
+        },
+        {
+          "name": "Количество листов в пачке",
+          "kind": "quantitative",
+          "unit": "шт",
+          "values": [
+            "500"
+          ],
+          "required": true,
+          "level_define": true
+        },
+        {
+          "name": "Белизна по CIE",
+          "kind": "quantitative",
+          "unit": "%",
+          "values": [
+            "166-170"
+          ],
+          "required": true
+        },
+        {
+          "name": "Непрозрачность",
+          "kind": "quantitative",
+          "unit": "%",
+          "values": [
+            "98-99"
+          ],
+          "required": true
+        },
+        {
+          "name": "Тип поверхности",
+          "kind": "qualitative",
+          "values": [
+            "Глянцевая"
+          ],
+          "required": true,
+          "level_define": true
+        },
+        {
+          "name": "Возможность двусторонней печати",
+          "kind": "qualitative",
+          "values": [
+            "Да"
+          ],
+          "required": true
+        },
+        {
+          "name": "Совместимость с лазерной печатью",
+          "kind": "qualitative",
+          "values": [
+            "Лазерная"
+          ],
+          "required": true
+        },
+        {
+          "name": "Совместимость со струйной печатью",
+          "kind": "qualitative",
+          "values": [
+            "Струйная"
+          ],
+          "required": true
+        },
+        {
+          "name": "Толщина листа",
+          "kind": "quantitative",
+          "unit": "мкм",
+          "values": [
+            "2"
+          ],
+          "required": false
+        }
+      ]
+    },
+    {
+      "code": "17.12.14.129-TEST0029",
+      "name": "Бумага для офисной техники белая A3 90 г/м² 500 листов, глянцевая",
+      "okpd2": "17.12.14.129",
+      "unit": "пач",
+      "characteristics": [
+        {
+          "name": "Формат",
+          "kind": "qualitative",
+          "values": [
+            "A3"
+          ],
+          "required": true,
+          "level_define": true
+        },
+        {
+          "name": "Масса бумаги площадью 1 м2",
+          "kind": "quantitative",
+          "unit": "г/м2",
+          "values": [
+            "90"
+          ],
+          "required": true,
+          "level_define": true
+        },
+        {
+          "name": "Количество листов в пачке",
+          "kind": "quantitative",
+          "unit": "шт",
+          "values": [
+            "500"
+          ],
+          "required": true,
+          "level_define": true
+        },
+        {
+          "name": "Белизна по CIE",
+          "kind": "quantitative",
+          "unit": "%",
+          "values": [
+            "161-165"
+          ],
+          "required": true
+        },
+        {
+          "name": "Непрозрачность",
+          "kind": "quantitative",
+          "unit": "%",
+          "values": [
+            "96-98"
+          ],
+          "required": true
+        },
+        {
+          "name": "Тип поверхности",
+          "kind": "qualitative",
+          "values": [
+            "Глянцевая"
+          ],
+          "required": true,
+          "level_define": true
+        },
+        {
+          "name": "Возможность двусторонней печати",
+          "kind": "qualitative",
+          "values": [
+            "Да"
+          ],
+          "required": true
+        },
+        {
+          "name": "Совместимость с лазерной печатью",
+          "kind": "qualitative",
+          "values": [
+            "Лазерная"
+          ],
+          "required": true
+        },
+        {
+          "name": "Совместимость со струйной печатью",
+          "kind": "qualitative",
+          "values": [
+            "Струйная"
+          ],
+          "required": true
+        },
+        {
+          "name": "Толщина листа",
+          "kind": "quantitative",
+          "unit": "мкм",
+          "values": [
+            "2"
+          ],
+          "required": false
+        }
+      ]
+    },
+    {
+      "code": "17.12.14.129-TEST0030",
+      "name": "Бумага для офисной техники белая A3 100 г/м² 500 листов, глянцевая",
+      "okpd2": "17.12.14.129",
+      "unit": "пач",
+      "characteristics": [
+        {
+          "name": "Формат",
+          "kind": "qualitative",
+          "values": [
+            "A3"
+          ],
+          "required": true,
+          "level_define": true
+        },
+        {
+          "name": "Масса бумаги площадью 1 м2",
+          "kind": "quantitative",
+          "unit": "г/м2",
+          "values": [
+            "100"
+          ],
+          "required": true,
+          "level_define": true
+        },
+        {
+          "name": "Количество листов в пачке",
+          "kind": "quantitative",
+          "unit": "шт",
+          "values": [
+            "500"
+          ],
+          "required": true,
+          "level_define": true
+        },
+        {
+          "name": "Белизна по CIE",
+          "kind": "quantitative",
+          "unit": "%",
+          "values": [
+            "166-170"
+          ],
+          "required": true
+        },
+        {
+          "name": "Непрозрачность",
+          "kind": "quantitative",
+          "unit": "%",
+          "values": [
+            "98-99"
+          ],
+          "required": true
+        },
+        {
+          "name": "Тип поверхности",
+          "kind": "qualitative",
+          "values": [
+            "Глянцевая"
+          ],
+          "required": true,
+          "level_define": true
+        },
+        {
+          "name": "Возможность двусторонней печати",
+          "kind": "qualitative",
+          "values": [
+            "Да"
+          ],
+          "required": true
+        },
+        {
+          "name": "Совместимость с лазерной печатью",
+          "kind": "qualitative",
+          "values": [
+            "Лазерная"
+          ],
+          "required": true
+        },
+        {
+          "name": "Совместимость со струйной печатью",
+          "kind": "qualitative",
+          "values": [
+            "Струйная"
+          ],
+          "required": true
+        },
+        {
+          "name": "Толщина листа",
+          "kind": "quantitative",
+          "unit": "мкм",
+          "values": [
+            "2"
+          ],
+          "required": false
+        }
+      ]
+    }
+  ]
+}

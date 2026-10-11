@@ -1,0 +1,48 @@
+@import "tailwindcss";
+
+/*
+ * Tailwind здесь только для раскладки (сетки, отступы); цвета, типографику и компоненты задаёт тема MUI
+ * (src/theme.ts). Порядок слоёв MUI и Tailwind объявляется в App.tsx через GlobalStyles.
+ */
+@theme {
+  --font-sans: "Open Sans Variable", "Open Sans", system-ui, "Segoe UI", Roboto, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, "Cascadia Mono", Consolas, monospace;
+}
+
+@layer base {
+  html {
+    color-scheme: light;
+    /* Текст растёт с шириной экрана: 16 px до 1440, около 18 px на 1920, 20 px с 2240. Размеры шрифта в rem, поэтому
+       на широком мониторе крупнее весь интерфейс, а не только основной текст. */
+    font-size: clamp(16px, calc(0.5vw + 8.8px), 20px);
+    /* Закреплённые шапка и полоса «Готово N из M» не закрывают поле, к которому перешёл фокус; в полосе бывает
+       и строка «Не отправлено: …» после неудачной отправки. */
+    scroll-padding-top: 120px;
+    scroll-padding-bottom: 128px;
+  }
+
+  /* С 1024 px шапка в одну строку высотой 80 px. */
+  @media (min-width: 1024px) {
+    html {
+      scroll-padding-top: 96px;
+    }
+  }
+
+  button,
+  a,
+  [role="button"] {
+    touch-action: manipulation;
+  }
+
+  /* Цвета синхронно с TOKENS в src/theme.ts: фон страницы — Pale Blue портала, текст — Black. Выделение — Gray Blue:
+     жёлтый только у «взято из вашего текста». */
+  body {
+    @apply min-h-dvh font-sans antialiased;
+    background: #e7eef7;
+    color: #1a1a1a;
+  }
+
+  ::selection {
+    background: #d4dbe6;
+  }
+}

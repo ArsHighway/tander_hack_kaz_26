@@ -1,0 +1,43 @@
+# окружения и кэши
+.venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+node_modules/
+dist/
+build/
+
+# секреты
+.env
+.env.*
+!.env.example
+
+# данные и веса (не версионируем)
+data/
+dataset/
+weights/
+*.gguf
+*.pt
+*.pth
+*.onnx
+*.safetensors
+*.parquet
+*.rar
+*.zip
+
+# Материалы организаторов прошлых хакатонов: по Положению их нельзя публиковать и передавать третьим лицам.
+# Выжимка — в docs/research/tenderhack-patterns.md. Убрать строку, если репозиторий точно приватный.
+docs/tender_last/
+docs/last_tender/
+
+# Снимки и журналы playwright-cli: артефакты проверок, не исходники.
+.playwright-cli/
+
+# IDE / ОС
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
+.vs/

@@ -1,0 +1,57 @@
+[project]
+name = "kazan-backend"
+version = "0.1.0"
+description = "TenderHack Казань 2026: API и воркер"
+requires-python = ">=3.12"
+dependencies = [
+    "alembic>=1.20.0",
+    "asyncpg>=0.31.0",
+    "fastapi>=0.142.2",
+    "faststream[cli,rabbit]>=0.7.7",
+    "httpx>=0.28.1",
+    "numpy>=2.5.3",
+    "openpyxl>=3.1.5",
+    "pgvector>=0.5.0",
+    "py7zr>=1.1.3",
+    "pydantic-settings>=2.15.0",
+    "pypdf[crypto]>=6.19.0",
+    "python-calamine>=0.8.2",
+    "python-multipart>=0.0.32",
+    "redis>=8.1.0",
+    "regex>=2026.9.29",
+    "snowballstemmer>=3.1.1",
+    "sqlalchemy[asyncio]>=2.1.1",
+    "uvicorn[standard]>=0.54.0",
+]
+
+[dependency-groups]
+dev = [
+    "mypy>=2.4.0",
+    "pytest>=9.1.1",
+    "ruff>=0.16.9",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+extend-exclude = ["migrations/versions"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "SIM", "RUF", "BLE"]
+# FastAPI Depends(...) в значениях по умолчанию — штатный приём.
+ignore = ["B008"]
+# Кириллица в строках и комментариях — норма для проекта.
+allowed-confusables = ["а", "в", "е", "к", "м", "о", "р", "с", "у", "х", "А", "В", "Е", "К", "М", "Н", "О", "Р", "С", "Т", "У", "Х", "г", "б", "З", "–", " ", " ", "×"]
+
+[tool.ruff.lint.per-file-ignores]
+# Таблица фейковых данных: длинные строки-записи читаются лучше неразрезанными.
+"scripts/make_fake_dataset.py" = ["E501"]
+
+[tool.mypy]
+python_version = "3.12"
+ignore_missing_imports = true
+files = ["app"]

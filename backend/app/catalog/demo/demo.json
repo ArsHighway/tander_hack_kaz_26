@@ -1,0 +1,907 @@
+{
+ "version": "synthetic-demo-2026-10-01",
+ "source": "synthetic",
+ "positions": [
+  {
+   "code": "17.12.14.129-00000031",
+   "name": "Бумага для офисной техники белая",
+   "okpd2": "17.12.14.129",
+   "unit": "пач",
+   "characteristics": [
+    {
+     "name": "Формат",
+     "kind": "qualitative",
+     "values": [
+      "A3",
+      "A4",
+      "A5"
+     ],
+     "required": true,
+     "level_define": true
+    },
+    {
+     "name": "Цветность",
+     "kind": "qualitative",
+     "values": [
+      "Белая"
+     ],
+     "required": true,
+     "level_define": true
+    },
+    {
+     "name": "Масса бумаги площадью 1м2",
+     "kind": "quantitative",
+     "unit": "г/м2",
+     "required": true,
+     "values": [
+      ">=60 ... <80",
+      ">=80 ... <90",
+      ">=90 ... <100",
+      ">=100 ... <120",
+      ">=120"
+     ]
+    },
+    {
+     "name": "Белизна",
+     "kind": "quantitative",
+     "unit": "%",
+     "required": false,
+     "range": {
+      "min": 90,
+      "max": 175
+     }
+    },
+    {
+     "name": "Непрозрачность",
+     "kind": "quantitative",
+     "unit": "%",
+     "required": false,
+     "range": {
+      "min": 85,
+      "max": 98
+     }
+    },
+    {
+     "name": "Количество листов в пачке",
+     "kind": "quantitative",
+     "unit": "шт",
+     "required": true,
+     "values": [
+      "250",
+      "500"
+     ]
+    },
+    {
+     "name": "Класс бумаги",
+     "kind": "qualitative",
+     "values": [
+      "A",
+      "B",
+      "C"
+     ],
+     "required": false
+    }
+   ]
+  },
+  {
+   "code": "17.12.14.129-00000017",
+   "name": "Бумага для офисной техники цветная",
+   "okpd2": "17.12.14.129",
+   "unit": "пач",
+   "characteristics": [
+    {
+     "name": "Формат",
+     "kind": "qualitative",
+     "values": [
+      "A3",
+      "A4"
+     ],
+     "required": true,
+     "level_define": true
+    },
+    {
+     "name": "Цветность",
+     "kind": "qualitative",
+     "values": [
+      "Цветная"
+     ],
+     "required": true,
+     "level_define": true
+    },
+    {
+     "name": "Интенсивность цвета",
+     "kind": "qualitative",
+     "values": [
+      "Интенсив",
+      "Медиум",
+      "Неон",
+      "Пастель"
+     ],
+     "required": true
+    },
+    {
+     "name": "Масса бумаги площадью 1м2",
+     "kind": "quantitative",
+     "unit": "г/м2",
+     "required": true,
+     "values": [
+      ">=60 ... <80",
+      ">=80 ... <90",
+      ">=90 ... <100",
+      ">=100 ... <120",
+      ">=120"
+     ]
+    },
+    {
+     "name": "Количество листов в пачке",
+     "kind": "quantitative",
+     "unit": "шт",
+     "required": true,
+     "values": [
+      "50",
+      "100",
+      "250",
+      "500"
+     ]
+    },
+    {
+     "name": "Количество цветов в пачке",
+     "kind": "quantitative",
+     "unit": "шт",
+     "required": false,
+     "range": {
+      "min": 1,
+      "max": 10
+     }
+    }
+   ]
+  },
+  {
+   "code": "17.12.14.110-00000004",
+   "name": "Бумага для плоттера в рулонах",
+   "okpd2": "17.12.14.110",
+   "unit": "рул",
+   "characteristics": [
+    {
+     "name": "Ширина рулона",
+     "kind": "quantitative",
+     "unit": "мм",
+     "required": true,
+     "level_define": true,
+     "range": {
+      "min": 297,
+      "max": 1067
+     }
+    },
+    {
+     "name": "Длина намотки",
+     "kind": "quantitative",
+     "unit": "м",
+     "required": true,
+     "range": {
+      "min": 45,
+      "max": 175
+     }
+    },
+    {
+     "name": "Масса бумаги площадью 1м2",
+     "kind": "quantitative",
+     "unit": "г/м2",
+     "required": true,
+     "values": [
+      ">=60 ... <80",
+      ">=80 ... <90",
+      ">=90 ... <100",
+      ">=100 ... <120",
+      ">=120"
+     ]
+    },
+    {
+     "name": "Диаметр втулки",
+     "kind": "quantitative",
+     "unit": "мм",
+     "required": false,
+     "values": [
+      "50,8",
+      "76,2"
+     ]
+    }
+   ]
+  },
+  {
+   "code": "22.22.11.000-00000201",
+   "name": "Мешки для мусора из полиэтилена низкого давления",
+   "okpd2": "22.22.11.000",
+   "unit": "уп",
+   "characteristics": [
+    {
+     "name": "Материал",
+     "kind": "qualitative",
+     "values": [
+      "ПНД"
+     ],
+     "required": true,
+     "level_define": true
+    },
+    {
+     "name": "Объем",
+     "kind": "quantitative",
+     "unit": "л",
+     "required": true,
+     "values": [
+      "30",
+      "35",
+      "60",
+      "120",
+      "240"
+     ]
+    },
+    {
+     "name": "Толщина",
+     "kind": "quantitative",
+     "unit": "мкм",
+     "required": true,
+     "range": {
+      "min": 8,
+      "max": 40
+     }
+    },
+    {
+     "name": "Количество в упаковке",
+     "kind": "quantitative",
+     "unit": "шт",
+     "required": true,
+     "range": {
+      "min": 5,
+      "max": 100
+     }
+    },
+    {
+     "name": "Наличие завязок",
+     "kind": "qualitative",
+     "values": [
+      "Да",
+      "Нет"
+     ],
+     "required": false
+    }
+   ]
+  },
+  {
+   "code": "22.22.11.000-00000202",
+   "name": "Мешки для мусора из полиэтилена высокого давления",
+   "okpd2": "22.22.11.000",
+   "unit": "уп",
+   "characteristics": [
+    {
+     "name": "Материал",
+     "kind": "qualitative",
+     "values": [
+      "ПВД"
+     ],
+     "required": true,
+     "level_define": true
+    },
+    {
+     "name": "Объем",
+     "kind": "quantitative",
+     "unit": "л",
+     "required": true,
+     "values": [
+      "60",
+      "120",
+      "160",
+      "240"
+     ]
+    },
+    {
+     "name": "Толщина",
+     "kind": "quantitative",
+     "unit": "мкм",
+     "required": true,
+     "range": {
+      "min": 30,
+      "max": 120
+     }
+    },
+    {
+     "name": "Количество в упаковке",
+     "kind": "quantitative",
+     "unit": "шт",
+     "required": true,
+     "range": {
+      "min": 5,
+      "max": 50
+     }
+    },
+    {
+     "name": "Наличие завязок",
+     "kind": "qualitative",
+     "values": [
+      "Да",
+      "Нет"
+     ],
+     "required": false
+    }
+   ]
+  },
+  {
+   "code": "22.19.60.119-00000301",
+   "name": "Перчатки смотровые нитриловые",
+   "okpd2": "22.19.60.119",
+   "unit": "пар",
+   "characteristics": [
+    {
+     "name": "Материал",
+     "kind": "qualitative",
+     "values": [
+      "Нитрил"
+     ],
+     "required": true,
+     "level_define": true
+    },
+    {
+     "name": "Размер",
+     "kind": "qualitative",
+     "values": [
+      "XS",
+      "S",
+      "M",
+      "L",
+      "XL"
+     ],
+     "required": true
+    },
+    {
+     "name": "Стерильность",
+     "kind": "qualitative",
+     "values": [
+      "Стерильные",
+      "Нестерильные"
+     ],
+     "required": true
+    },
+    {
+     "name": "Опудренность",
+     "kind": "qualitative",
+     "values": [
+      "Опудренные",
+      "Неопудренные"
+     ],
+     "required": true
+    },
+    {
+     "name": "Количество пар в упаковке",
+     "kind": "quantitative",
+     "unit": "пар",
+     "required": false,
+     "values": [
+      "50",
+      "100"
+     ]
+    }
+   ]
+  },
+  {
+   "code": "22.19.60.119-00000302",
+   "name": "Перчатки смотровые латексные",
+   "okpd2": "22.19.60.119",
+   "unit": "пар",
+   "characteristics": [
+    {
+     "name": "Материал",
+     "kind": "qualitative",
+     "values": [
+      "Латекс"
+     ],
+     "required": true,
+     "level_define": true
+    },
+    {
+     "name": "Размер",
+     "kind": "qualitative",
+     "values": [
+      "S",
+      "M",
+      "L",
+      "XL"
+     ],
+     "required": true
+    },
+    {
+     "name": "Стерильность",
+     "kind": "qualitative",
+     "values": [
+      "Стерильные",
+      "Нестерильные"
+     ],
+     "required": true
+    },
+    {
+     "name": "Опудренность",
+     "kind": "qualitative",
+     "values": [
+      "Опудренные",
+      "Неопудренные"
+     ],
+     "required": true
+    },
+    {
+     "name": "Количество пар в упаковке",
+     "kind": "quantitative",
+     "unit": "пар",
+     "required": false,
+     "values": [
+      "50",
+      "100"
+     ]
+    }
+   ]
+  },
+  {
+   "code": "27.20.11.000-00000501",
+   "name": "Элемент питания щелочной (алкалиновый)",
+   "okpd2": "27.20.11.000",
+   "unit": "шт",
+   "characteristics": [
+    {
+     "name": "Электрохимическая система",
+     "kind": "qualitative",
+     "values": [
+      "Щелочная"
+     ],
+     "required": true,
+     "level_define": true
+    },
+    {
+     "name": "Типоразмер",
+     "kind": "qualitative",
+     "values": [
+      "AA",
+      "AAA",
+      "C",
+      "D",
+      "9V"
+     ],
+     "required": true
+    },
+    {
+     "name": "Номинальное напряжение",
+     "kind": "quantitative",
+     "unit": "В",
+     "required": true,
+     "values": [
+      "1,5",
+      "9"
+     ]
+    },
+    {
+     "name": "Количество в упаковке",
+     "kind": "quantitative",
+     "unit": "шт",
+     "required": false,
+     "range": {
+      "min": 1,
+      "max": 40
+     }
+    }
+   ]
+  },
+  {
+   "code": "27.20.11.000-00000502",
+   "name": "Элемент питания солевой",
+   "okpd2": "27.20.11.000",
+   "unit": "шт",
+   "characteristics": [
+    {
+     "name": "Электрохимическая система",
+     "kind": "qualitative",
+     "values": [
+      "Солевая"
+     ],
+     "required": true,
+     "level_define": true
+    },
+    {
+     "name": "Типоразмер",
+     "kind": "qualitative",
+     "values": [
+      "AA",
+      "AAA",
+      "D"
+     ],
+     "required": true
+    },
+    {
+     "name": "Номинальное напряжение",
+     "kind": "quantitative",
+     "unit": "В",
+     "required": true,
+     "values": [
+      "1,5"
+     ]
+    },
+    {
+     "name": "Количество в упаковке",
+     "kind": "quantitative",
+     "unit": "шт",
+     "required": false,
+     "range": {
+      "min": 1,
+      "max": 24
+     }
+    }
+   ]
+  },
+  {
+   "code": "20.59.30.000-00000601",
+   "name": "Картридж для лазерного принтера и МФУ",
+   "okpd2": "20.59.30.000",
+   "unit": "шт",
+   "characteristics": [
+    {
+     "name": "Технология печати",
+     "kind": "qualitative",
+     "values": [
+      "Лазерная"
+     ],
+     "required": true,
+     "level_define": true
+    },
+    {
+     "name": "Цвет печати",
+     "kind": "qualitative",
+     "values": [
+      "Черный",
+      "Голубой",
+      "Пурпурный",
+      "Желтый"
+     ],
+     "required": true
+    },
+    {
+     "name": "Ресурс",
+     "kind": "quantitative",
+     "unit": "лист",
+     "required": true,
+     "range": {
+      "min": 500,
+      "max": 40000
+     }
+    },
+    {
+     "name": "Оригинальность",
+     "kind": "qualitative",
+     "values": [
+      "Оригинальный",
+      "Совместимый"
+     ],
+     "required": true
+    }
+   ]
+  },
+  {
+   "code": "20.59.30.000-00000602",
+   "name": "Картридж для струйного принтера",
+   "okpd2": "20.59.30.000",
+   "unit": "шт",
+   "characteristics": [
+    {
+     "name": "Технология печати",
+     "kind": "qualitative",
+     "values": [
+      "Струйная"
+     ],
+     "required": true,
+     "level_define": true
+    },
+    {
+     "name": "Цвет печати",
+     "kind": "qualitative",
+     "values": [
+      "Черный",
+      "Голубой",
+      "Пурпурный",
+      "Желтый",
+      "Трехцветный"
+     ],
+     "required": true
+    },
+    {
+     "name": "Объем чернил",
+     "kind": "quantitative",
+     "unit": "мл",
+     "required": true,
+     "range": {
+      "min": 2,
+      "max": 80
+     }
+    },
+    {
+     "name": "Оригинальность",
+     "kind": "qualitative",
+     "values": [
+      "Оригинальный",
+      "Совместимый"
+     ],
+     "required": true
+    }
+   ]
+  },
+  {
+   "code": "32.99.12.110-00000701",
+   "name": "Ручка шариковая",
+   "okpd2": "32.99.12.110",
+   "unit": "шт",
+   "characteristics": [
+    {
+     "name": "Тип ручки",
+     "kind": "qualitative",
+     "values": [
+      "Шариковая"
+     ],
+     "required": true,
+     "level_define": true
+    },
+    {
+     "name": "Цвет чернил",
+     "kind": "qualitative",
+     "values": [
+      "Синий",
+      "Черный",
+      "Красный",
+      "Зеленый"
+     ],
+     "required": true
+    },
+    {
+     "name": "Толщина линии",
+     "kind": "quantitative",
+     "unit": "мм",
+     "required": true,
+     "values": [
+      "0,5",
+      "0,7",
+      "1"
+     ]
+    },
+    {
+     "name": "Автоматическая",
+     "kind": "qualitative",
+     "values": [
+      "Да",
+      "Нет"
+     ],
+     "required": false
+    }
+   ]
+  },
+  {
+   "code": "32.99.12.120-00000702",
+   "name": "Ручка гелевая",
+   "okpd2": "32.99.12.120",
+   "unit": "шт",
+   "characteristics": [
+    {
+     "name": "Тип ручки",
+     "kind": "qualitative",
+     "values": [
+      "Гелевая"
+     ],
+     "required": true,
+     "level_define": true
+    },
+    {
+     "name": "Цвет чернил",
+     "kind": "qualitative",
+     "values": [
+      "Синий",
+      "Черный",
+      "Красный"
+     ],
+     "required": true
+    },
+    {
+     "name": "Толщина линии",
+     "kind": "quantitative",
+     "unit": "мм",
+     "required": true,
+     "values": [
+      "0,5",
+      "0,7"
+     ]
+    },
+    {
+     "name": "Автоматическая",
+     "kind": "qualitative",
+     "values": [
+      "Да",
+      "Нет"
+     ],
+     "required": false
+    }
+   ]
+  },
+  {
+   "code": "20.41.32.119-00000801",
+   "name": "Средство для мытья стекол",
+   "okpd2": "20.41.32.119",
+   "unit": "шт",
+   "characteristics": [
+    {
+     "name": "Назначение",
+     "kind": "qualitative",
+     "values": [
+      "Для стекол и зеркал"
+     ],
+     "required": true,
+     "level_define": true
+    },
+    {
+     "name": "Объем",
+     "kind": "quantitative",
+     "unit": "мл",
+     "required": true,
+     "range": {
+      "min": 250,
+      "max": 5000
+     }
+    },
+    {
+     "name": "Форма выпуска",
+     "kind": "qualitative",
+     "values": [
+      "Жидкость",
+      "Спрей"
+     ],
+     "required": true
+    },
+    {
+     "name": "Наличие спирта",
+     "kind": "qualitative",
+     "values": [
+      "Да",
+      "Нет"
+     ],
+     "required": false
+    }
+   ]
+  },
+  {
+   "code": "20.41.32.119-00000802",
+   "name": "Средство для мытья полов",
+   "okpd2": "20.41.32.119",
+   "unit": "шт",
+   "characteristics": [
+    {
+     "name": "Назначение",
+     "kind": "qualitative",
+     "values": [
+      "Для полов"
+     ],
+     "required": true,
+     "level_define": true
+    },
+    {
+     "name": "Объем",
+     "kind": "quantitative",
+     "unit": "мл",
+     "required": true,
+     "range": {
+      "min": 500,
+      "max": 5000
+     }
+    },
+    {
+     "name": "Форма выпуска",
+     "kind": "qualitative",
+     "values": [
+      "Жидкость",
+      "Гель",
+      "Концентрат"
+     ],
+     "required": true
+    },
+    {
+     "name": "Наличие хлора",
+     "kind": "qualitative",
+     "values": [
+      "Да",
+      "Нет"
+     ],
+     "required": false
+    }
+   ]
+  },
+  {
+   "code": "17.23.13.193-00000901",
+   "name": "Папка-регистратор",
+   "okpd2": "17.23.13.193",
+   "unit": "шт",
+   "characteristics": [
+    {
+     "name": "Тип папки",
+     "kind": "qualitative",
+     "values": [
+      "Регистратор"
+     ],
+     "required": true,
+     "level_define": true
+    },
+    {
+     "name": "Формат",
+     "kind": "qualitative",
+     "values": [
+      "A4",
+      "A5"
+     ],
+     "required": true
+    },
+    {
+     "name": "Ширина корешка",
+     "kind": "quantitative",
+     "unit": "мм",
+     "required": true,
+     "values": [
+      "50",
+      "75",
+      "80"
+     ]
+    },
+    {
+     "name": "Материал обложки",
+     "kind": "qualitative",
+     "values": [
+      "Картон",
+      "ПВХ",
+      "Полипропилен"
+     ],
+     "required": true
+    }
+   ]
+  },
+  {
+   "code": "17.23.13.193-00000902",
+   "name": "Папка-скоросшиватель",
+   "okpd2": "17.23.13.193",
+   "unit": "шт",
+   "characteristics": [
+    {
+     "name": "Тип папки",
+     "kind": "qualitative",
+     "values": [
+      "Скоросшиватель"
+     ],
+     "required": true,
+     "level_define": true
+    },
+    {
+     "name": "Формат",
+     "kind": "qualitative",
+     "values": [
+      "A4"
+     ],
+     "required": true
+    },
+    {
+     "name": "Материал обложки",
+     "kind": "qualitative",
+     "values": [
+      "Картон",
+      "Пластик"
+     ],
+     "required": true
+    },
+    {
+     "name": "Прозрачный верхний лист",
+     "kind": "qualitative",
+     "values": [
+      "Да",
+      "Нет"
+     ],
+     "required": false
+    }
+   ]
+  }
+ ]
+}

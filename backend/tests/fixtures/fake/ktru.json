@@ -1,0 +1,278 @@
+{
+ "version": "fake-2026-09-30",
+ "positions": [
+  {
+   "code": "17.12.14.129-00000101",
+   "name": "Бумага для офисной техники белая",
+   "okpd2": "17.12.14.129",
+   "unit": "пач",
+   "characteristics": [
+    {
+     "name": "Формат",
+     "kind": "qualitative",
+     "values": [
+      "A3",
+      "A4",
+      "A5"
+     ],
+     "required": true
+    },
+    {
+     "name": "Масса бумаги площадью 1 м2",
+     "kind": "quantitative",
+     "unit": "г/м2",
+     "values": [
+      ">=80 ... <90",
+      ">=90 ... <100",
+      ">=100"
+     ],
+     "required": true
+    },
+    {
+     "name": "Белизна по CIE",
+     "kind": "quantitative",
+     "unit": "%",
+     "range": {
+      "min": 146,
+      "max": 175
+     },
+     "required": false
+    },
+    {
+     "name": "Количество листов в пачке",
+     "kind": "quantitative",
+     "unit": "шт",
+     "values": [
+      "250",
+      "500"
+     ],
+     "required": true
+    },
+    {
+     "name": "Класс",
+     "kind": "qualitative",
+     "values": [
+      "A",
+      "B",
+      "C"
+     ],
+     "required": false
+    }
+   ]
+  },
+  {
+   "code": "17.12.14.129-00000102",
+   "name": "Бумага для офисной техники цветная",
+   "okpd2": "17.12.14.129",
+   "unit": "пач",
+   "characteristics": [
+    {
+     "name": "Формат",
+     "kind": "qualitative",
+     "values": [
+      "A3",
+      "A4"
+     ],
+     "required": true
+    },
+    {
+     "name": "Цветность",
+     "kind": "qualitative",
+     "values": [
+      "Цветная"
+     ],
+     "required": true
+    },
+    {
+     "name": "Интенсивность цвета",
+     "kind": "qualitative",
+     "values": [
+      "Интенсив",
+      "Медиум",
+      "Неон",
+      "Пастель"
+     ],
+     "required": true
+    },
+    {
+     "name": "Количество листов в пачке",
+     "kind": "quantitative",
+     "unit": "шт",
+     "values": [
+      "50",
+      "100",
+      "250",
+      "500"
+     ],
+     "required": true
+    }
+   ]
+  },
+  {
+   "code": "22.22.11.000-00000201",
+   "name": "Мешки для мусора",
+   "okpd2": "22.22.11.000",
+   "unit": "уп",
+   "characteristics": [
+    {
+     "name": "Объем",
+     "kind": "quantitative",
+     "unit": "л",
+     "values": [
+      "30",
+      "35",
+      "60",
+      "120",
+      "240"
+     ],
+     "required": true
+    },
+    {
+     "name": "Толщина",
+     "kind": "quantitative",
+     "unit": "мкм",
+     "range": {
+      "min": 8,
+      "max": 120
+     },
+     "required": true
+    },
+    {
+     "name": "Материал",
+     "kind": "qualitative",
+     "values": [
+      "ПВД",
+      "ПНД"
+     ],
+     "required": true
+    },
+    {
+     "name": "Количество в упаковке",
+     "kind": "quantitative",
+     "unit": "шт",
+     "range": {
+      "min": 5,
+      "max": 100
+     },
+     "required": false
+    }
+   ]
+  },
+  {
+   "code": "22.19.60.119-00000301",
+   "name": "Перчатки смотровые нитриловые",
+   "okpd2": "22.19.60.119",
+   "unit": "пар",
+   "characteristics": [
+    {
+     "name": "Размер",
+     "kind": "qualitative",
+     "values": [
+      "XS",
+      "S",
+      "M",
+      "L",
+      "XL"
+     ],
+     "required": true
+    },
+    {
+     "name": "Стерильность",
+     "kind": "qualitative",
+     "values": [
+      "Нестерильные",
+      "Стерильные"
+     ],
+     "required": true
+    },
+    {
+     "name": "Опудренность",
+     "kind": "qualitative",
+     "values": [
+      "Неопудренные",
+      "Опудренные"
+     ],
+     "required": false
+    }
+   ]
+  },
+  {
+   "code": "20.59.12.120-00000401",
+   "name": "Картридж для МФУ лазерный",
+   "okpd2": "20.59.12.120",
+   "unit": "шт",
+   "characteristics": [
+    {
+     "name": "Цвет печати",
+     "kind": "qualitative",
+     "values": [
+      "Черный",
+      "Голубой",
+      "Пурпурный",
+      "Желтый"
+     ],
+     "required": true
+    },
+    {
+     "name": "Ресурс",
+     "kind": "quantitative",
+     "unit": "стр",
+     "range": {
+      "min": 500,
+      "max": 40000
+     },
+     "required": true
+    },
+    {
+     "name": "Оригинальность",
+     "kind": "qualitative",
+     "values": [
+      "Оригинальный",
+      "Совместимый"
+     ],
+     "required": false
+    }
+   ]
+  },
+  {
+   "code": "27.20.11.000-00000501",
+   "name": "Батарея первичная",
+   "okpd2": "27.20.11.000",
+   "unit": "шт",
+   "characteristics": [
+    {
+     "name": "Типоразмер",
+     "kind": "qualitative",
+     "values": [
+      "AA",
+      "AAA",
+      "C",
+      "D",
+      "9V"
+     ],
+     "required": true
+    },
+    {
+     "name": "Номинальное напряжение",
+     "kind": "quantitative",
+     "unit": "В",
+     "values": [
+      "1,5",
+      "9"
+     ],
+     "required": true
+    },
+    {
+     "name": "Электрохимическая система",
+     "kind": "qualitative",
+     "values": [
+      "Щелочная",
+      "Солевая",
+      "Литиевая"
+     ],
+     "required": true
+    }
+   ]
+  }
+ ]
+}

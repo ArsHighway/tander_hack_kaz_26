@@ -1,0 +1,175 @@
+[
+ {
+  "id": "91000001",
+  "ktru": "17.12.14.129-00000101",
+  "errors": []
+ },
+ {
+  "id": "91000002",
+  "ktru": "17.12.14.129-00000101",
+  "errors": [
+   {
+    "type": "value_not_in_list",
+    "characteristic": "Интенсивность цвета",
+    "value": "Белый",
+    "why": "у белой бумаги нет интенсивности цвета; это позиция цветной бумаги"
+   },
+   {
+    "type": "cyrillic_in_latin_value",
+    "characteristic": "Формат",
+    "value": "А4",
+    "expected": "A4"
+   }
+  ]
+ },
+ {
+  "id": "91000003",
+  "ktru": "17.12.14.129-00000102",
+  "errors": []
+ },
+ {
+  "id": "91000004",
+  "ktru": "17.12.14.129-00000101",
+  "errors": [
+   {
+    "type": "typo_in_name",
+    "value": "афисная",
+    "expected": "офисная"
+   },
+   {
+    "type": "out_of_range",
+    "characteristic": "Масса бумаги площадью 1 м2",
+    "value": "800",
+    "why": "офисная бумага 60–300 г/м2; вероятно лишний ноль"
+   },
+   {
+    "type": "missing_required",
+    "characteristic": "Количество листов в пачке"
+   }
+  ]
+ },
+ {
+  "id": "91000005",
+  "ktru": null,
+  "errors": [
+   {
+    "type": "ambiguous_ktru",
+    "candidates": [
+     "17.12.14.129-00000101",
+     "17.12.14.129-00000102"
+    ],
+    "ask": "Цветность или Белизна по CIE"
+   }
+  ]
+ },
+ {
+  "id": "91000006",
+  "ktru": "22.22.11.000-00000201",
+  "errors": [
+   {
+    "type": "synonym_name",
+    "characteristic": "Вид материала",
+    "expected": "Материал"
+   }
+  ]
+ },
+ {
+  "id": "91000007",
+  "ktru": "22.22.11.000-00000201",
+  "errors": [
+   {
+    "type": "unit_mismatch",
+    "characteristic": "Толщина",
+    "value": "40 мм",
+    "expected": "40 мкм",
+    "why": "мешок толщиной 40 мм невозможен; в позиции КТРУ толщина в мкм"
+   }
+  ]
+ },
+ {
+  "id": "91000008",
+  "ktru": "22.22.11.000-00000201",
+  "errors": [
+   {
+    "type": "empty_characteristics",
+    "autofill_from_name": {
+     "Объем": "240",
+     "Цвет": "черный"
+    }
+   }
+  ]
+ },
+ {
+  "id": "91000009",
+  "ktru": "22.19.60.119-00000301",
+  "errors": []
+ },
+ {
+  "id": "91000010",
+  "ktru": "22.19.60.119-00000301",
+  "errors": [
+   {
+    "type": "value_not_in_list",
+    "characteristic": "Размер",
+    "value": "XXL",
+    "why": "в позиции КТРУ размеры XS–XL"
+   },
+   {
+    "type": "abbreviated_value",
+    "characteristic": "Стерильность",
+    "value": "нестерильн.",
+    "expected": "Нестерильные"
+   }
+  ]
+ },
+ {
+  "id": "91000011",
+  "ktru": "20.59.12.120-00000401",
+  "errors": []
+ },
+ {
+  "id": "91000012",
+  "ktru": "20.59.12.120-00000401",
+  "errors": [
+   {
+    "type": "typo_in_value",
+    "characteristic": "Цвет печати",
+    "value": "Чорный",
+    "expected": "Черный"
+   }
+  ]
+ },
+ {
+  "id": "91000013",
+  "ktru": "27.20.11.000-00000501",
+  "errors": [
+   {
+    "type": "cyrillic_in_latin_value",
+    "characteristic": "Типоразмер",
+    "value": "АА",
+    "expected": "AA"
+   },
+   {
+    "type": "synonym_value",
+    "characteristic": "Электрохимическая система",
+    "value": "Алкалиновая",
+    "expected": "Щелочная"
+   }
+  ]
+ },
+ {
+  "id": "91000014",
+  "ktru": "27.20.11.000-00000501",
+  "errors": []
+ },
+ {
+  "id": "91000015",
+  "ktru": "17.12.14.129-00000101",
+  "errors": [
+   {
+    "type": "name_contains_value_and_unit",
+    "why": "правило модерации: в наименовании не пишут значение и единицу"
+   }
+  ]
+ }
+]

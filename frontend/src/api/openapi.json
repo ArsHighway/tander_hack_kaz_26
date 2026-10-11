@@ -1,0 +1,3942 @@
+{
+ "components": {
+  "schemas": {
+   "AcceptCleanIn": {
+    "properties": {
+     "ids": {
+      "anyOf": [
+       {
+        "items": {
+         "type": "integer"
+        },
+        "type": "array"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "description": "заявки, которые модератор видел в списке подтверждения; нет — все чистые",
+      "title": "Ids"
+     }
+    },
+    "title": "AcceptCleanIn",
+    "type": "object"
+   },
+   "AcceptedClean": {
+    "properties": {
+     "accepted": {
+      "items": {
+       "type": "integer"
+      },
+      "title": "Accepted",
+      "type": "array"
+     }
+    },
+    "required": [
+     "accepted"
+    ],
+    "title": "AcceptedClean",
+    "type": "object"
+   },
+   "AnswerIn": {
+    "properties": {
+     "characteristic": {
+      "maxLength": 500,
+      "title": "Characteristic",
+      "type": "string"
+     },
+     "stage": {
+      "default": "category",
+      "description": "чей вопрос: `ktru` — сужение до позиции КТРУ внутри категории (`chain.ktru`)",
+      "enum": [
+       "category",
+       "ktru"
+      ],
+      "title": "Stage",
+      "type": "string"
+     },
+     "value": {
+      "description": "вариант вопроса; пустая строка — «нет такой характеристики»",
+      "maxLength": 4000,
+      "title": "Value",
+      "type": "string"
+     }
+    },
+    "required": [
+     "characteristic",
+     "value"
+    ],
+    "title": "AnswerIn",
+    "type": "object"
+   },
+   "AuditExample": {
+    "properties": {
+     "field": {
+      "title": "Field",
+      "type": "string"
+     },
+     "fix": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Fix"
+     },
+     "id": {
+      "title": "Id",
+      "type": "integer"
+     },
+     "message": {
+      "title": "Message",
+      "type": "string"
+     },
+     "name": {
+      "title": "Name",
+      "type": "string"
+     },
+     "url": {
+      "title": "Url",
+      "type": "string"
+     }
+    },
+    "required": [
+     "id",
+     "url",
+     "name",
+     "field",
+     "message"
+    ],
+    "title": "AuditExample",
+    "type": "object"
+   },
+   "AuditRule": {
+    "properties": {
+     "cards": {
+      "title": "Cards",
+      "type": "integer"
+     },
+     "examples": {
+      "items": {
+       "$ref": "#/components/schemas/AuditExample"
+      },
+      "title": "Examples",
+      "type": "array"
+     },
+     "rule": {
+      "title": "Rule",
+      "type": "string"
+     },
+     "share": {
+      "title": "Share",
+      "type": "number"
+     }
+    },
+    "required": [
+     "rule",
+     "cards",
+     "share",
+     "examples"
+    ],
+    "title": "AuditRule",
+    "type": "object"
+   },
+   "AutofillIn": {
+    "properties": {
+     "description": {
+      "default": "",
+      "description": "описание в свободной форме",
+      "maxLength": 20000,
+      "title": "Description",
+      "type": "string"
+     },
+     "name": {
+      "description": "наименование СТЕ, как его ввёл поставщик",
+      "maxLength": 1000,
+      "minLength": 1,
+      "title": "Name",
+      "type": "string"
+     }
+    },
+    "required": [
+     "name"
+    ],
+    "title": "AutofillIn",
+    "type": "object"
+   },
+   "AutofillOut": {
+    "properties": {
+     "chain": {
+      "anyOf": [
+       {
+        "$ref": "#/components/schemas/Chain"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "description": "есть, когда категория определена"
+     },
+     "characteristics": {
+      "items": {
+       "$ref": "#/components/schemas/CharacteristicOut"
+      },
+      "title": "Characteristics",
+      "type": "array"
+     },
+     "degraded": {
+      "items": {
+       "enum": [
+        "llm",
+        "embeddings"
+       ],
+       "type": "string"
+      },
+      "title": "Degraded",
+      "type": "array"
+     },
+     "description": {
+      "default": "",
+      "description": "остаток текста поставщика после наименования: подписи и значения",
+      "title": "Description",
+      "type": "string"
+     },
+     "extra": {
+      "default": [],
+      "description": "свойства из описания вне шаблона категории и КТРУ («Метка: значение»): `origin: portal` — так характеристику пишут на портале, `new` — новая; не выбрасываются",
+      "items": {
+       "$ref": "#/components/schemas/CharacteristicOut"
+      },
+      "title": "Extra",
+      "type": "array"
+     },
+     "issues": {
+      "items": {
+       "$ref": "#/components/schemas/Issue"
+      },
+      "title": "Issues",
+      "type": "array"
+     },
+     "ktru": {
+      "$ref": "#/components/schemas/KtruState"
+     },
+     "llm": {
+      "default": "on",
+      "description": "модель: включена; выключена модератором; включена, но не ответила",
+      "enum": [
+       "on",
+       "off",
+       "unavailable"
+      ],
+      "title": "Llm",
+      "type": "string"
+     },
+     "name": {
+      "default": "",
+      "description": "наименование для карточки: текст до первой характеристики, если поставщик вставил описание одной строкой",
+      "title": "Name",
+      "type": "string"
+     },
+     "session_id": {
+      "title": "Session Id",
+      "type": "string"
+     },
+     "suggestions": {
+      "default": [],
+      "description": "куда можно поставить непонятые куски текста (второй слой модели, проверено кодом): поле, значение, есть ли оно в перечне; в карточку — только по решению поставщика",
+      "items": {
+       "$ref": "#/components/schemas/Suggestion"
+      },
+      "title": "Suggestions",
+      "type": "array"
+     },
+     "twins": {
+      "default": [],
+      "description": "такие СТЕ уже есть на портале (до пяти, сначала из определённой категории): заявку-дубль модератор отклонит с причиной «Предложена другая СТЕ»",
+      "items": {
+       "$ref": "#/components/schemas/TwinOut"
+      },
+      "title": "Twins",
+      "type": "array"
+     },
+     "unread": {
+      "default": [],
+      "description": "куски описания, которые не легли ни в одно поле и не в extra (без рекламы и цены): поставщик видит, что из его текста не потеряно, и переносит сам",
+      "items": {
+       "$ref": "#/components/schemas/Span"
+      },
+      "title": "Unread",
+      "type": "array"
+     }
+    },
+    "required": [
+     "session_id",
+     "ktru",
+     "characteristics",
+     "issues",
+     "degraded"
+    ],
+    "title": "AutofillOut",
+    "type": "object"
+   },
+   "BatchAccepted": {
+    "properties": {
+     "job_id": {
+      "title": "Job Id",
+      "type": "string"
+     },
+     "status_url": {
+      "title": "Status Url",
+      "type": "string"
+     }
+    },
+    "required": [
+     "job_id",
+     "status_url"
+    ],
+    "title": "BatchAccepted",
+    "type": "object"
+   },
+   "BatchResultPage": {
+    "description": "Сохранённые строки по всему пакету, в порядке исходного файла.\n\nВо время обработки новые результаты могут появиться перед курсором: обновление\nначинает просмотр сначала. Необработанные строки в результаты не входят.",
+    "properties": {
+     "matched": {
+      "title": "Matched",
+      "type": "integer"
+     },
+     "next_after_row": {
+      "anyOf": [
+       {
+        "type": "integer"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Next After Row"
+     },
+     "rows": {
+      "items": {
+       "$ref": "#/components/schemas/BatchRowResult"
+      },
+      "title": "Rows",
+      "type": "array"
+     }
+    },
+    "required": [
+     "rows",
+     "matched"
+    ],
+    "title": "BatchResultPage",
+    "type": "object"
+   },
+   "BatchRowIn": {
+    "description": "Что поставщик прислал в строке файла: с этим строка открывается в форме карточки.",
+    "properties": {
+     "characteristics": {
+      "items": {
+       "$ref": "#/components/schemas/CharIn"
+      },
+      "title": "Characteristics",
+      "type": "array"
+     },
+     "description": {
+      "title": "Description",
+      "type": "string"
+     },
+     "name": {
+      "title": "Name",
+      "type": "string"
+     },
+     "row": {
+      "title": "Row",
+      "type": "integer"
+     }
+    },
+    "required": [
+     "row",
+     "name",
+     "description",
+     "characteristics"
+    ],
+    "title": "BatchRowIn",
+    "type": "object"
+   },
+   "BatchRowResult": {
+    "properties": {
+     "category_code": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Category Code"
+     },
+     "degraded": {
+      "default": [],
+      "items": {
+       "enum": [
+        "llm",
+        "embeddings"
+       ],
+       "type": "string"
+      },
+      "title": "Degraded",
+      "type": "array"
+     },
+     "error": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Error"
+     },
+     "filled": {
+      "title": "Filled",
+      "type": "integer"
+     },
+     "hinted": {
+      "default": 0,
+      "title": "Hinted",
+      "type": "integer"
+     },
+     "issues": {
+      "items": {
+       "$ref": "#/components/schemas/Issue"
+      },
+      "title": "Issues",
+      "type": "array"
+     },
+     "ktru_code": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Ktru Code"
+     },
+     "name": {
+      "title": "Name",
+      "type": "string"
+     },
+     "note": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Note"
+     },
+     "row": {
+      "title": "Row",
+      "type": "integer"
+     },
+     "status": {
+      "enum": [
+       "ready",
+       "needs_answer",
+       "needs_fix",
+       "not_found",
+       "skipped",
+       "failed"
+      ],
+      "title": "Status",
+      "type": "string"
+     }
+    },
+    "required": [
+     "row",
+     "name",
+     "status",
+     "ktru_code",
+     "filled",
+     "issues"
+    ],
+    "title": "BatchRowResult",
+    "type": "object"
+   },
+   "BatchState": {
+    "properties": {
+     "counts": {
+      "additionalProperties": {
+       "type": "integer"
+      },
+      "default": {},
+      "title": "Counts",
+      "type": "object"
+     },
+     "created_at": {
+      "anyOf": [
+       {
+        "format": "date-time",
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Created At"
+     },
+     "filename": {
+      "title": "Filename",
+      "type": "string"
+     },
+     "job_id": {
+      "title": "Job Id",
+      "type": "string"
+     },
+     "processed": {
+      "title": "Processed",
+      "type": "integer"
+     },
+     "rows": {
+      "items": {
+       "$ref": "#/components/schemas/BatchRowResult"
+      },
+      "title": "Rows",
+      "type": "array"
+     },
+     "status": {
+      "enum": [
+       "queued",
+       "running",
+       "done",
+       "failed",
+       "cancelled"
+      ],
+      "title": "Status",
+      "type": "string"
+     },
+     "total": {
+      "title": "Total",
+      "type": "integer"
+     }
+    },
+    "required": [
+     "job_id",
+     "status",
+     "filename",
+     "total",
+     "processed",
+     "rows"
+    ],
+    "title": "BatchState",
+    "type": "object"
+   },
+   "Body_post_batch_api_v1_batch_post": {
+    "properties": {
+     "file": {
+      "contentMediaType": "application/octet-stream",
+      "title": "File",
+      "type": "string"
+     }
+    },
+    "required": [
+     "file"
+    ],
+    "title": "Body_post_batch_api_v1_batch_post",
+    "type": "object"
+   },
+   "Body_post_extract_api_v1_extract_post": {
+    "properties": {
+     "file": {
+      "contentMediaType": "application/octet-stream",
+      "title": "File",
+      "type": "string"
+     }
+    },
+    "required": [
+     "file"
+    ],
+    "title": "Body_post_extract_api_v1_extract_post",
+    "type": "object"
+   },
+   "Body_post_photo_api_demo_photos_post": {
+    "properties": {
+     "file": {
+      "contentMediaType": "application/octet-stream",
+      "title": "File",
+      "type": "string"
+     }
+    },
+    "required": [
+     "file"
+    ],
+    "title": "Body_post_photo_api_demo_photos_post",
+    "type": "object"
+   },
+   "Candidate": {
+    "properties": {
+     "code": {
+      "title": "Code",
+      "type": "string"
+     },
+     "conflicts": {
+      "default": [],
+      "items": {
+       "type": "string"
+      },
+      "title": "Conflicts",
+      "type": "array"
+     },
+     "examples": {
+      "default": [],
+      "items": {
+       "$ref": "#/components/schemas/SimilarSku"
+      },
+      "title": "Examples",
+      "type": "array"
+     },
+     "ktru_distinct": {
+      "anyOf": [
+       {
+        "type": "integer"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Ktru Distinct"
+     },
+     "ktru_total": {
+      "anyOf": [
+       {
+        "type": "integer"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Ktru Total"
+     },
+     "matched": {
+      "default": [],
+      "items": {
+       "type": "string"
+      },
+      "title": "Matched",
+      "type": "array"
+     },
+     "missing": {
+      "default": [],
+      "items": {
+       "type": "string"
+      },
+      "title": "Missing",
+      "type": "array"
+     },
+     "name": {
+      "title": "Name",
+      "type": "string"
+     },
+     "score": {
+      "title": "Score",
+      "type": "number"
+     },
+     "similar": {
+      "anyOf": [
+       {
+        "type": "number"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Similar"
+     },
+     "similar_count": {
+      "anyOf": [
+       {
+        "type": "integer"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Similar Count"
+     },
+     "similar_total": {
+      "anyOf": [
+       {
+        "type": "integer"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Similar Total"
+     },
+     "why": {
+      "items": {
+       "type": "string"
+      },
+      "title": "Why",
+      "type": "array"
+     }
+    },
+    "required": [
+     "code",
+     "name",
+     "score",
+     "why"
+    ],
+    "title": "Candidate",
+    "type": "object"
+   },
+   "CardIn": {
+    "properties": {
+     "category_code": {
+      "anyOf": [
+       {
+        "maxLength": 64,
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "description": "Код категории справочника (КПГЗ, `ktru.final_code` первого этапа): по ней проверяются характеристики. Пусто — категорией считается `ktru_code`.",
+      "title": "Category Code"
+     },
+     "characteristics": {
+      "default": [],
+      "items": {
+       "$ref": "#/components/schemas/CharIn"
+      },
+      "maxItems": 300,
+      "title": "Characteristics",
+      "type": "array"
+     },
+     "description": {
+      "default": "",
+      "maxLength": 20000,
+      "title": "Description",
+      "type": "string"
+     },
+     "ktru_code": {
+      "anyOf": [
+       {
+        "maxLength": 64,
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "description": "Итоговый код позиции КТРУ (второй этап, `chain.ktru.final_code`). Если `category_code` пуст, здесь принимается и код категории справочника.",
+      "title": "Ktru Code"
+     },
+     "name": {
+      "maxLength": 1000,
+      "title": "Name",
+      "type": "string"
+     },
+     "photo_id": {
+      "anyOf": [
+       {
+        "type": "integer"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "description": "Фото товара, загруженное заранее (`POST /api/demo/photos`). Нет — `/check` предупреждает (`warn` на поле `photo`): на портале изображение у товара обязательно.",
+      "title": "Photo Id"
+     }
+    },
+    "required": [
+     "name"
+    ],
+    "title": "CardIn",
+    "type": "object"
+   },
+   "Chain": {
+    "description": "Коды найденной категории и второй этап — позиция КТРУ внутри неё.",
+    "properties": {
+     "category": {
+      "description": "код позиции справочника (у стандартов портала — КПГЗ)",
+      "title": "Category",
+      "type": "string"
+     },
+     "category_name": {
+      "title": "Category Name",
+      "type": "string"
+     },
+     "category_via": {
+      "anyOf": [
+       {
+        "enum": [
+         "ktru_link",
+         "search",
+         "none"
+        ],
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "description": "откуда категория портала (КПГЗ): по связи с КТРУ, поиском или связи нет",
+      "title": "Category Via"
+     },
+     "kpgz": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Kpgz"
+     },
+     "ktru": {
+      "anyOf": [
+       {
+        "$ref": "#/components/schemas/KtruState"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "description": "сужение до позиции КТРУ; нет — у категории нет КТРУ или справочник не загружен"
+     },
+     "ktru_linked": {
+      "description": "сколько позиций КТРУ привязано к категории",
+      "title": "Ktru Linked",
+      "type": "integer"
+     },
+     "ktru_merged": {
+      "default": [],
+      "description": "одинаковые позиции КТРУ (шаблон и позиция из него), из которых оставлена более свежая: что объединено и почему — для поставщика",
+      "items": {
+       "$ref": "#/components/schemas/KtruMerge"
+      },
+      "title": "Ktru Merged",
+      "type": "array"
+     },
+     "ktru_missing": {
+      "anyOf": [
+       {
+        "enum": [
+         "no_links",
+         "not_loaded"
+        ],
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "description": "почему нет второго этапа: у категории нет ссылок на КТРУ (no_links) или привязанных позиций нет в справочнике КТРУ (not_loaded); код КТРУ тогда пустой",
+      "title": "Ktru Missing"
+     },
+     "ktru_type": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "description": "тип товара по КТРУ — наименование позиций КТРУ",
+      "title": "Ktru Type"
+     },
+     "okpd2": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Okpd2"
+     },
+     "path": {
+      "default": [],
+      "description": "имена узлов пути категории от раздела до самой категории, без «Товары»; пусто у справочника не из стандартов портала",
+      "items": {
+       "type": "string"
+      },
+      "title": "Path",
+      "type": "array"
+     },
+     "portal_id": {
+      "anyOf": [
+       {
+        "type": "integer"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "description": "id категории на портале (картинка категории, ссылка)",
+      "title": "Portal Id"
+     },
+     "spgz": {
+      "description": "коды СПГЗ, на которые ссылаются характеристики категории",
+      "items": {
+       "type": "string"
+      },
+      "title": "Spgz",
+      "type": "array"
+     }
+    },
+    "required": [
+     "category",
+     "category_name",
+     "kpgz",
+     "okpd2",
+     "spgz",
+     "ktru_linked",
+     "ktru"
+    ],
+    "title": "Chain",
+    "type": "object"
+   },
+   "CharIn": {
+    "properties": {
+     "name": {
+      "maxLength": 500,
+      "title": "Name",
+      "type": "string"
+     },
+     "origin": {
+      "anyOf": [
+       {
+        "enum": [
+         "ktru",
+         "portal",
+         "new"
+        ],
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "description": "откуда характеристика (`CharacteristicOut.origin`): `ktru` и вне шаблона категории (`portal`, `new`) — не ошибка «нет в позиции»; пусто — проверка по позиции",
+      "title": "Origin"
+     },
+     "unit": {
+      "anyOf": [
+       {
+        "maxLength": 50,
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Unit"
+     },
+     "value": {
+      "maxLength": 4000,
+      "title": "Value",
+      "type": "string"
+     }
+    },
+    "required": [
+     "name",
+     "value"
+    ],
+    "title": "CharIn",
+    "type": "object"
+   },
+   "CharacteristicOut": {
+    "properties": {
+     "checked": {
+      "anyOf": [
+       {
+        "type": "boolean"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "description": "значение модели подтверждено кодом: в цитате есть и подпись этой характеристики, и само значение — не «требует проверки»",
+      "title": "Checked"
+     },
+     "compact": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "description": "то же значение короче в другой единице той же величины («1,5 м» при 1500 мм) — подсказка для чтения; значение остаётся в единице позиции",
+      "title": "Compact"
+     },
+     "group": {
+      "anyOf": [
+       {
+        "const": "general",
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Group"
+     },
+     "ktru_fit": {
+      "anyOf": [
+       {
+        "enum": [
+         "in_list",
+         "normalized",
+         "in_range",
+         "not_in_list",
+         "out_of_range"
+        ],
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "description": "как значение поставщика легло в характеристику КТРУ: есть в перечне, приведено к формулировке КТРУ («глина» → «Глиняный»), попало в диапазон, нет в перечне, вне всех диапазонов; пусто — характеристика не из КТРУ или значения нет",
+      "title": "Ktru Fit"
+     },
+     "ktru_match": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "description": "значение или корзина КТРУ, к которой привязано значение поставщика («Деревянный», «>=400 ... <=500»); в `value` остаётся конкретное значение поставщика",
+      "title": "Ktru Match"
+     },
+     "method": {
+      "anyOf": [
+       {
+        "enum": [
+         "rule",
+         "llm",
+         "answer",
+         "twin",
+         "similar"
+        ],
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "description": "откуда значение: правило по тексту, модель по тексту, ответ на вопрос, такая же СТЕ портала (`twins`) или похожие СТЕ портала — подсказки, в тексте значения нет",
+      "title": "Method"
+     },
+     "name": {
+      "title": "Name",
+      "type": "string"
+     },
+     "normalized_from": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Normalized From"
+     },
+     "note": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Note"
+     },
+     "origin": {
+      "default": "portal",
+      "description": "откуда характеристика: `ktru` — есть у позиции КТРУ (итоговой, а пока её нет — у позиций КТРУ категории); `portal` — шаблон категории портала или, в `extra`, так её пишут на портале; `new` — новая, её нет ни в КТРУ, ни на портале",
+      "enum": [
+       "ktru",
+       "portal",
+       "new"
+      ],
+      "title": "Origin",
+      "type": "string"
+     },
+     "range": {
+      "anyOf": [
+       {
+        "$ref": "#/components/schemas/NumRange"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "description": "допустимый числовой диапазон выбранной позиции"
+     },
+     "required": {
+      "title": "Required",
+      "type": "boolean"
+     },
+     "source": {
+      "anyOf": [
+       {
+        "$ref": "#/components/schemas/Span"
+       },
+       {
+        "type": "null"
+       }
+      ]
+     },
+     "status": {
+      "enum": [
+       "filled",
+       "normalized",
+       "not_found",
+       "conflict"
+      ],
+      "title": "Status",
+      "type": "string"
+     },
+     "unit": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Unit"
+     },
+     "unit_name": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "description": "единица полным названием по ОКЕИ",
+      "title": "Unit Name"
+     },
+     "value": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Value"
+     },
+     "values": {
+      "description": "допустимые значения выбранной позиции; пусто — перечня нет",
+      "items": {
+       "type": "string"
+      },
+      "title": "Values",
+      "type": "array"
+     }
+    },
+    "required": [
+     "name",
+     "value",
+     "unit",
+     "source",
+     "status",
+     "required"
+    ],
+    "title": "CharacteristicOut",
+    "type": "object"
+   },
+   "CharacteristicSpec": {
+    "description": "Характеристика позиции: перечень (`values`) или диапазон (`range`), единица.",
+    "properties": {
+     "group": {
+      "anyOf": [
+       {
+        "const": "general",
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Group"
+     },
+     "kind": {
+      "enum": [
+       "qualitative",
+       "quantitative"
+      ],
+      "title": "Kind",
+      "type": "string"
+     },
+     "ktru": {
+      "default": [],
+      "items": {
+       "type": "string"
+      },
+      "title": "Ktru",
+      "type": "array"
+     },
+     "level_define": {
+      "default": false,
+      "title": "Level Define",
+      "type": "boolean"
+     },
+     "name": {
+      "title": "Name",
+      "type": "string"
+     },
+     "plausible": {
+      "anyOf": [
+       {
+        "$ref": "#/components/schemas/NumRange"
+       },
+       {
+        "type": "null"
+       }
+      ]
+     },
+     "range": {
+      "anyOf": [
+       {
+        "$ref": "#/components/schemas/NumRange"
+       },
+       {
+        "type": "null"
+       }
+      ]
+     },
+     "required": {
+      "default": false,
+      "title": "Required",
+      "type": "boolean"
+     },
+     "spgz": {
+      "default": [],
+      "items": {
+       "type": "string"
+      },
+      "title": "Spgz",
+      "type": "array"
+     },
+     "synonyms": {
+      "default": [],
+      "items": {
+       "type": "string"
+      },
+      "title": "Synonyms",
+      "type": "array"
+     },
+     "unit": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Unit"
+     },
+     "values": {
+      "default": [],
+      "items": {
+       "type": "string"
+      },
+      "title": "Values",
+      "type": "array"
+     }
+    },
+    "required": [
+     "name",
+     "kind"
+    ],
+    "title": "CharacteristicSpec",
+    "type": "object"
+   },
+   "CheckOut": {
+    "properties": {
+     "issues": {
+      "items": {
+       "$ref": "#/components/schemas/Issue"
+      },
+      "title": "Issues",
+      "type": "array"
+     },
+     "verdict": {
+      "enum": [
+       "ready",
+       "needs_fix"
+      ],
+      "title": "Verdict",
+      "type": "string"
+     }
+    },
+    "required": [
+     "issues",
+     "verdict"
+    ],
+    "title": "CheckOut",
+    "type": "object"
+   },
+   "DecisionIn": {
+    "properties": {
+     "decision": {
+      "enum": [
+       "accept",
+       "return"
+      ],
+      "title": "Decision",
+      "type": "string"
+     },
+     "note": {
+      "anyOf": [
+       {
+        "maxLength": 5000,
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Note"
+     }
+    },
+    "required": [
+     "decision"
+    ],
+    "title": "DecisionIn",
+    "type": "object"
+   },
+   "DependencyStatus": {
+    "properties": {
+     "detail": {
+      "title": "Detail",
+      "type": "string"
+     },
+     "latency_ms": {
+      "title": "Latency Ms",
+      "type": "number"
+     },
+     "name": {
+      "title": "Name",
+      "type": "string"
+     },
+     "ok": {
+      "title": "Ok",
+      "type": "boolean"
+     },
+     "required": {
+      "title": "Required",
+      "type": "boolean"
+     }
+    },
+    "required": [
+     "name",
+     "ok",
+     "required",
+     "detail",
+     "latency_ms"
+    ],
+    "title": "DependencyStatus",
+    "type": "object"
+   },
+   "ExtractOut": {
+    "properties": {
+     "items": {
+      "description": "сколько товаров в файле; больше одного — открыть массовую загрузку; таблица читается не дальше 10 000 строк, 10 001 значит «больше 10 000»",
+      "title": "Items",
+      "type": "integer"
+     },
+     "kind": {
+      "enum": [
+       "docx",
+       "pdf",
+       "table",
+       "text"
+      ],
+      "title": "Kind",
+      "type": "string"
+     },
+     "text": {
+      "description": "текст товара для шага 1: наименование первой строкой",
+      "title": "Text",
+      "type": "string"
+     }
+    },
+    "required": [
+     "text",
+     "items",
+     "kind"
+    ],
+    "title": "ExtractOut",
+    "type": "object"
+   },
+   "Fix": {
+    "properties": {
+     "name": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Name"
+     },
+     "unit": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Unit"
+     },
+     "value": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Value"
+     }
+    },
+    "title": "Fix",
+    "type": "object"
+   },
+   "HTTPValidationError": {
+    "properties": {
+     "detail": {
+      "items": {
+       "$ref": "#/components/schemas/ValidationError"
+      },
+      "title": "Detail",
+      "type": "array"
+     }
+    },
+    "title": "HTTPValidationError",
+    "type": "object"
+   },
+   "HoldoutOut": {
+    "properties": {
+     "cases": {
+      "title": "Cases",
+      "type": "integer"
+     },
+     "catalog": {
+      "title": "Catalog",
+      "type": "string"
+     },
+     "created_at": {
+      "format": "date-time",
+      "title": "Created At",
+      "type": "string"
+     },
+     "llm": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Llm"
+     },
+     "rows": {
+      "items": {
+       "$ref": "#/components/schemas/MetricRow"
+      },
+      "title": "Rows",
+      "type": "array"
+     }
+    },
+    "required": [
+     "created_at",
+     "catalog",
+     "cases",
+     "rows"
+    ],
+    "title": "HoldoutOut",
+    "type": "object"
+   },
+   "Issue": {
+    "properties": {
+     "field": {
+      "title": "Field",
+      "type": "string"
+     },
+     "fix": {
+      "anyOf": [
+       {
+        "$ref": "#/components/schemas/Fix"
+       },
+       {
+        "type": "null"
+       }
+      ]
+     },
+     "kind": {
+      "enum": [
+       "typo",
+       "mismatch",
+       "not_in_list",
+       "moderation_rule",
+       "duplicate"
+      ],
+      "title": "Kind",
+      "type": "string"
+     },
+     "message": {
+      "title": "Message",
+      "type": "string"
+     },
+     "rule": {
+      "title": "Rule",
+      "type": "string"
+     },
+     "severity": {
+      "enum": [
+       "block",
+       "warn",
+       "info"
+      ],
+      "title": "Severity",
+      "type": "string"
+     },
+     "why": {
+      "title": "Why",
+      "type": "string"
+     }
+    },
+    "required": [
+     "field",
+     "kind",
+     "severity",
+     "message",
+     "why",
+     "rule"
+    ],
+    "title": "Issue",
+    "type": "object"
+   },
+   "JobAccepted": {
+    "properties": {
+     "job_id": {
+      "title": "Job Id",
+      "type": "string"
+     },
+     "status_url": {
+      "title": "Status Url",
+      "type": "string"
+     }
+    },
+    "required": [
+     "job_id",
+     "status_url"
+    ],
+    "title": "JobAccepted",
+    "type": "object"
+   },
+   "JobState": {
+    "properties": {
+     "detail": {
+      "default": "",
+      "title": "Detail",
+      "type": "string"
+     },
+     "job_id": {
+      "title": "Job Id",
+      "type": "string"
+     },
+     "status": {
+      "enum": [
+       "queued",
+       "done",
+       "failed"
+      ],
+      "title": "Status",
+      "type": "string"
+     },
+     "updated_at": {
+      "format": "date-time",
+      "title": "Updated At",
+      "type": "string"
+     }
+    },
+    "required": [
+     "job_id",
+     "status"
+    ],
+    "title": "JobState",
+    "type": "object"
+   },
+   "KtruMerge": {
+    "description": "Одинаковые позиции КТРУ, из которых оставлена одна.",
+    "properties": {
+     "dropped": {
+      "description": "коды с теми же наименованием и характеристиками",
+      "items": {
+       "type": "string"
+      },
+      "title": "Dropped",
+      "type": "array"
+     },
+     "kept": {
+      "description": "код, который остался в выборе",
+      "title": "Kept",
+      "type": "string"
+     },
+     "message": {
+      "description": "что объединено и почему взята эта позиция — для человека",
+      "title": "Message",
+      "type": "string"
+     },
+     "name": {
+      "title": "Name",
+      "type": "string"
+     }
+    },
+    "required": [
+     "kept",
+     "dropped",
+     "name",
+     "message"
+    ],
+    "title": "KtruMerge",
+    "type": "object"
+   },
+   "KtruState": {
+    "properties": {
+     "candidates": {
+      "items": {
+       "$ref": "#/components/schemas/Candidate"
+      },
+      "title": "Candidates",
+      "type": "array"
+     },
+     "final_code": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Final Code"
+     },
+     "question": {
+      "anyOf": [
+       {
+        "$ref": "#/components/schemas/Question"
+       },
+       {
+        "type": "null"
+       }
+      ]
+     },
+     "remaining": {
+      "title": "Remaining",
+      "type": "integer"
+     },
+     "steps": {
+      "items": {
+       "type": "string"
+      },
+      "title": "Steps",
+      "type": "array"
+     },
+     "trail": {
+      "default": [],
+      "description": "воронка сужения по шагам, от всего справочника КТРУ до кода",
+      "items": {
+       "$ref": "#/components/schemas/TrailStep"
+      },
+      "title": "Trail",
+      "type": "array"
+     }
+    },
+    "required": [
+     "candidates",
+     "remaining",
+     "final_code",
+     "question",
+     "steps"
+    ],
+    "title": "KtruState",
+    "type": "object"
+   },
+   "MetricRow": {
+    "properties": {
+     "how": {
+      "title": "How",
+      "type": "string"
+     },
+     "key": {
+      "title": "Key",
+      "type": "string"
+     },
+     "n": {
+      "title": "N",
+      "type": "integer"
+     },
+     "title": {
+      "title": "Title",
+      "type": "string"
+     },
+     "value": {
+      "title": "Value",
+      "type": "number"
+     }
+    },
+    "required": [
+     "key",
+     "title",
+     "value",
+     "n",
+     "how"
+    ],
+    "title": "MetricRow",
+    "type": "object"
+   },
+   "MetricsOut": {
+    "properties": {
+     "catalog_source": {
+      "title": "Catalog Source",
+      "type": "string"
+     },
+     "catalog_version": {
+      "title": "Catalog Version",
+      "type": "string"
+     },
+     "created_at": {
+      "format": "date-time",
+      "title": "Created At",
+      "type": "string"
+     },
+     "model": {
+      "title": "Model",
+      "type": "string"
+     },
+     "rows": {
+      "items": {
+       "$ref": "#/components/schemas/MetricRow"
+      },
+      "title": "Rows",
+      "type": "array"
+     }
+    },
+    "required": [
+     "created_at",
+     "catalog_version",
+     "catalog_source",
+     "model",
+     "rows"
+    ],
+    "title": "MetricsOut",
+    "type": "object"
+   },
+   "ModuleSettings": {
+    "properties": {
+     "llm_budget_s": {
+      "anyOf": [
+       {
+        "type": "number"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "description": "сколько шаг мастера ждёт модель, с; пусто — без предела",
+      "title": "Llm Budget S"
+     },
+     "llm_enabled": {
+      "description": "модель включена: дозаполняет то, чего не нашли правила",
+      "title": "Llm Enabled",
+      "type": "boolean"
+     }
+    },
+    "required": [
+     "llm_enabled",
+     "llm_budget_s"
+    ],
+    "title": "ModuleSettings",
+    "type": "object"
+   },
+   "ModuleSettingsIn": {
+    "properties": {
+     "llm_enabled": {
+      "title": "Llm Enabled",
+      "type": "boolean"
+     }
+    },
+    "required": [
+     "llm_enabled"
+    ],
+    "title": "ModuleSettingsIn",
+    "type": "object"
+   },
+   "NumRange": {
+    "properties": {
+     "max": {
+      "anyOf": [
+       {
+        "type": "number"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Max"
+     },
+     "min": {
+      "anyOf": [
+       {
+        "type": "number"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Min"
+     }
+    },
+    "title": "NumRange",
+    "type": "object"
+   },
+   "Option": {
+    "properties": {
+     "codes": {
+      "default": [],
+      "description": "коды позиций, которые останутся после этого ответа (первые три)",
+      "items": {
+       "type": "string"
+      },
+      "title": "Codes",
+      "type": "array"
+     },
+     "cuts": {
+      "title": "Cuts",
+      "type": "integer"
+     },
+     "label": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "description": "что показать в варианте вместо `value` (наименование КТРУ у варианта-кода); пусто — показывать `value`",
+      "title": "Label"
+     },
+     "remaining": {
+      "title": "Remaining",
+      "type": "integer"
+     },
+     "value": {
+      "title": "Value",
+      "type": "string"
+     }
+    },
+    "required": [
+     "value",
+     "remaining",
+     "cuts"
+    ],
+    "title": "Option",
+    "type": "object"
+   },
+   "PortalAudit": {
+    "properties": {
+     "cards": {
+      "title": "Cards",
+      "type": "integer"
+     },
+     "rules": {
+      "items": {
+       "$ref": "#/components/schemas/AuditRule"
+      },
+      "title": "Rules",
+      "type": "array"
+     },
+     "share": {
+      "title": "Share",
+      "type": "number"
+     },
+     "with_issues": {
+      "title": "With Issues",
+      "type": "integer"
+     }
+    },
+    "required": [
+     "cards",
+     "with_issues",
+     "share",
+     "rules"
+    ],
+    "title": "PortalAudit",
+    "type": "object"
+   },
+   "PortalReport": {
+    "properties": {
+     "audit": {
+      "$ref": "#/components/schemas/PortalAudit"
+     },
+     "cards": {
+      "title": "Cards",
+      "type": "integer"
+     },
+     "categories": {
+      "title": "Categories",
+      "type": "integer"
+     },
+     "created_at": {
+      "format": "date-time",
+      "title": "Created At",
+      "type": "string"
+     },
+     "fill": {
+      "items": {
+       "$ref": "#/components/schemas/MetricRow"
+      },
+      "title": "Fill",
+      "type": "array"
+     },
+     "source": {
+      "title": "Source",
+      "type": "string"
+     }
+    },
+    "required": [
+     "created_at",
+     "cards",
+     "categories",
+     "source",
+     "audit",
+     "fill"
+    ],
+    "title": "PortalReport",
+    "type": "object"
+   },
+   "Position": {
+    "properties": {
+     "characteristics": {
+      "items": {
+       "$ref": "#/components/schemas/CharacteristicSpec"
+      },
+      "title": "Characteristics",
+      "type": "array"
+     },
+     "code": {
+      "title": "Code",
+      "type": "string"
+     },
+     "image_id": {
+      "anyOf": [
+       {
+        "type": "integer"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Image Id"
+     },
+     "kpgz": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Kpgz"
+     },
+     "name": {
+      "title": "Name",
+      "type": "string"
+     },
+     "okpd2": {
+      "title": "Okpd2",
+      "type": "string"
+     },
+     "path": {
+      "default": [],
+      "items": {
+       "type": "string"
+      },
+      "title": "Path",
+      "type": "array"
+     },
+     "portal_id": {
+      "anyOf": [
+       {
+        "type": "integer"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Portal Id"
+     },
+     "source": {
+      "title": "Source",
+      "type": "string"
+     },
+     "unit": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Unit"
+     }
+    },
+    "required": [
+     "code",
+     "name",
+     "okpd2",
+     "characteristics",
+     "source"
+    ],
+    "title": "Position",
+    "type": "object"
+   },
+   "Question": {
+    "properties": {
+     "characteristic": {
+      "title": "Characteristic",
+      "type": "string"
+     },
+     "options": {
+      "items": {
+       "$ref": "#/components/schemas/Option"
+      },
+      "title": "Options",
+      "type": "array"
+     }
+    },
+    "required": [
+     "characteristic",
+     "options"
+    ],
+    "title": "Question",
+    "type": "object"
+   },
+   "QueuedSubmission": {
+    "properties": {
+     "accepted": {
+      "items": {
+       "$ref": "#/components/schemas/CharacteristicOut"
+      },
+      "title": "Accepted",
+      "type": "array"
+     },
+     "batch": {
+      "anyOf": [
+       {
+        "$ref": "#/components/schemas/SubmissionBatch"
+       },
+       {
+        "type": "null"
+       }
+      ]
+     },
+     "card": {
+      "$ref": "#/components/schemas/StoredCard"
+     },
+     "created_at": {
+      "format": "date-time",
+      "title": "Created At",
+      "type": "string"
+     },
+     "decision_note": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Decision Note"
+     },
+     "id": {
+      "title": "Id",
+      "type": "integer"
+     },
+     "status": {
+      "enum": [
+       "pending",
+       "accepted",
+       "returned"
+      ],
+      "title": "Status",
+      "type": "string"
+     },
+     "triage": {
+      "anyOf": [
+       {
+        "$ref": "#/components/schemas/Triage"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "description": "только у ждущей решения: чистая или почему открыть"
+     }
+    },
+    "required": [
+     "id",
+     "created_at",
+     "card",
+     "accepted",
+     "status"
+    ],
+    "title": "QueuedSubmission",
+    "type": "object"
+   },
+   "Readiness": {
+    "properties": {
+     "dependencies": {
+      "items": {
+       "$ref": "#/components/schemas/DependencyStatus"
+      },
+      "title": "Dependencies",
+      "type": "array"
+     },
+     "status": {
+      "enum": [
+       "ok",
+       "degraded",
+       "fail"
+      ],
+      "title": "Status",
+      "type": "string"
+     }
+    },
+    "required": [
+     "status",
+     "dependencies"
+    ],
+    "title": "Readiness",
+    "type": "object"
+   },
+   "SimilarSku": {
+    "description": "СТЕ портала, похожая на текст поставщика: подсказка к варианту категории.",
+    "properties": {
+     "id": {
+      "title": "Id",
+      "type": "integer"
+     },
+     "name": {
+      "title": "Name",
+      "type": "string"
+     }
+    },
+    "required": [
+     "id",
+     "name"
+    ],
+    "title": "SimilarSku",
+    "type": "object"
+   },
+   "Span": {
+    "description": "Фрагмент исходного текста: в наименовании или в описании, позиции в символах.",
+    "properties": {
+     "end": {
+      "title": "End",
+      "type": "integer"
+     },
+     "field": {
+      "enum": [
+       "name",
+       "description"
+      ],
+      "title": "Field",
+      "type": "string"
+     },
+     "start": {
+      "title": "Start",
+      "type": "integer"
+     },
+     "text": {
+      "title": "Text",
+      "type": "string"
+     }
+    },
+    "required": [
+     "field",
+     "start",
+     "end",
+     "text"
+    ],
+    "title": "Span",
+    "type": "object"
+   },
+   "StoredCard": {
+    "description": "Карточка в заявке: как её сохранили. Лимиты и очистка — у входа (`CardIn`), а запись,\nсделанная раньше и нарушающая нынешние лимиты, всё равно читается и показывается.",
+    "properties": {
+     "category_code": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Category Code"
+     },
+     "characteristics": {
+      "default": [],
+      "items": {
+       "$ref": "#/components/schemas/StoredChar"
+      },
+      "title": "Characteristics",
+      "type": "array"
+     },
+     "description": {
+      "default": "",
+      "title": "Description",
+      "type": "string"
+     },
+     "ktru_code": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Ktru Code"
+     },
+     "name": {
+      "title": "Name",
+      "type": "string"
+     },
+     "photo_id": {
+      "anyOf": [
+       {
+        "type": "integer"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Photo Id"
+     }
+    },
+    "required": [
+     "name"
+    ],
+    "title": "StoredCard",
+    "type": "object"
+   },
+   "StoredChar": {
+    "properties": {
+     "name": {
+      "title": "Name",
+      "type": "string"
+     },
+     "origin": {
+      "anyOf": [
+       {
+        "enum": [
+         "ktru",
+         "portal",
+         "new"
+        ],
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Origin"
+     },
+     "unit": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Unit"
+     },
+     "value": {
+      "title": "Value",
+      "type": "string"
+     }
+    },
+    "required": [
+     "name",
+     "value"
+    ],
+    "title": "StoredChar",
+    "type": "object"
+   },
+   "Submission": {
+    "properties": {
+     "accepted": {
+      "items": {
+       "$ref": "#/components/schemas/CharacteristicOut"
+      },
+      "title": "Accepted",
+      "type": "array"
+     },
+     "batch": {
+      "anyOf": [
+       {
+        "$ref": "#/components/schemas/SubmissionBatch"
+       },
+       {
+        "type": "null"
+       }
+      ]
+     },
+     "card": {
+      "$ref": "#/components/schemas/StoredCard"
+     },
+     "created_at": {
+      "format": "date-time",
+      "title": "Created At",
+      "type": "string"
+     },
+     "decision_note": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Decision Note"
+     },
+     "id": {
+      "title": "Id",
+      "type": "integer"
+     },
+     "status": {
+      "enum": [
+       "pending",
+       "accepted",
+       "returned"
+      ],
+      "title": "Status",
+      "type": "string"
+     }
+    },
+    "required": [
+     "id",
+     "created_at",
+     "card",
+     "accepted",
+     "status"
+    ],
+    "title": "Submission",
+    "type": "object"
+   },
+   "SubmissionBatch": {
+    "description": "Строка пакета, из которой поставщик открыл карточку в форме: «Мои заявки» делят заявки на\nединичные и из массовой загрузки.",
+    "properties": {
+     "filename": {
+      "default": "",
+      "maxLength": 255,
+      "title": "Filename",
+      "type": "string"
+     },
+     "job_id": {
+      "maxLength": 64,
+      "title": "Job Id",
+      "type": "string"
+     },
+     "row": {
+      "minimum": 1.0,
+      "title": "Row",
+      "type": "integer"
+     }
+    },
+    "required": [
+     "job_id",
+     "row"
+    ],
+    "title": "SubmissionBatch",
+    "type": "object"
+   },
+   "SubmissionIn": {
+    "properties": {
+     "accepted": {
+      "default": [],
+      "items": {
+       "$ref": "#/components/schemas/CharacteristicOut"
+      },
+      "title": "Accepted",
+      "type": "array"
+     },
+     "batch": {
+      "anyOf": [
+       {
+        "$ref": "#/components/schemas/SubmissionBatch"
+       },
+       {
+        "type": "null"
+       }
+      ]
+     },
+     "card": {
+      "$ref": "#/components/schemas/CardIn"
+     }
+    },
+    "required": [
+     "card"
+    ],
+    "title": "SubmissionIn",
+    "type": "object"
+   },
+   "SubmissionView": {
+    "properties": {
+     "accepted": {
+      "items": {
+       "$ref": "#/components/schemas/CharacteristicOut"
+      },
+      "title": "Accepted",
+      "type": "array"
+     },
+     "batch": {
+      "anyOf": [
+       {
+        "$ref": "#/components/schemas/SubmissionBatch"
+       },
+       {
+        "type": "null"
+       }
+      ]
+     },
+     "card": {
+      "$ref": "#/components/schemas/StoredCard"
+     },
+     "check": {
+      "$ref": "#/components/schemas/CheckOut"
+     },
+     "created_at": {
+      "format": "date-time",
+      "title": "Created At",
+      "type": "string"
+     },
+     "decision_note": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Decision Note"
+     },
+     "id": {
+      "title": "Id",
+      "type": "integer"
+     },
+     "status": {
+      "enum": [
+       "pending",
+       "accepted",
+       "returned"
+      ],
+      "title": "Status",
+      "type": "string"
+     },
+     "triage": {
+      "$ref": "#/components/schemas/Triage"
+     }
+    },
+    "required": [
+     "id",
+     "created_at",
+     "card",
+     "accepted",
+     "status",
+     "check",
+     "triage"
+    ],
+    "title": "SubmissionView",
+    "type": "object"
+   },
+   "Suggestion": {
+    "description": "Куда можно поставить непонятый кусок текста — поставщик решает сам.",
+    "properties": {
+     "allowed": {
+      "default": [],
+      "description": "допустимые значения поля, если перечень есть",
+      "items": {
+       "type": "string"
+      },
+      "title": "Allowed",
+      "type": "array"
+     },
+     "field": {
+      "description": "поле карточки, к которому он относится",
+      "title": "Field",
+      "type": "string"
+     },
+     "in_list": {
+      "description": "значение есть в перечне поля (КТРУ или шаблона)",
+      "title": "In List",
+      "type": "boolean"
+     },
+     "quote": {
+      "description": "кусок текста поставщика, который не лёг ни в одно поле",
+      "title": "Quote",
+      "type": "string"
+     },
+     "reason": {
+      "default": "",
+      "title": "Reason",
+      "type": "string"
+     },
+     "value": {
+      "description": "значение для поля: из перечня, если смысл тот же, иначе как в тексте",
+      "title": "Value",
+      "type": "string"
+     }
+    },
+    "required": [
+     "quote",
+     "field",
+     "value",
+     "in_list"
+    ],
+    "title": "Suggestion",
+    "type": "object"
+   },
+   "TrailStep": {
+    "description": "Шаг воронки сужения: что сузило выбор и сколько позиций КТРУ осталось.",
+    "properties": {
+     "label": {
+      "description": "«Все позиции КТРУ», «Тип: Тумбочка прикроватная», «Ширина: 450 мм»",
+      "title": "Label",
+      "type": "string"
+     },
+     "remaining": {
+      "title": "Remaining",
+      "type": "integer"
+     }
+    },
+    "required": [
+     "label",
+     "remaining"
+    ],
+    "title": "TrailStep",
+    "type": "object"
+   },
+   "Triage": {
+    "description": "Нужен ли заявке взгляд модератора. Чистая — без блокирующих замечаний и предупреждений\nмодуля (в т. ч. «такая СТЕ уже есть» и значения вне перечня позиции КТРУ): такую модератор\nодобряет вместе с остальными чистыми одной кнопкой, после подтверждения списка.\n\nПодсказки СТЕ портала чистоте не мешают, их только считают (`hinted`, модератор видит число и\nподпись «Принято из подсказки» у поля): в карточку подсказка попадает лишь по «Принять» самого\nпоставщика, непринятая в заявку не уходит вовсе. Подсказки есть почти у всех карточек мастера:\nусловие «принятая подсказка — не чистая» закрыло бы «Одобрить чистые» почти для всех заявок.",
+    "properties": {
+     "clean": {
+      "title": "Clean",
+      "type": "boolean"
+     },
+     "hinted": {
+      "default": 0,
+      "description": "значений из подсказок СТЕ портала, принятых поставщиком без правки",
+      "title": "Hinted",
+      "type": "integer"
+     },
+     "reasons": {
+      "description": "почему заявку стоит открыть; пусто — чистая",
+      "items": {
+       "type": "string"
+      },
+      "title": "Reasons",
+      "type": "array"
+     }
+    },
+    "required": [
+     "clean",
+     "reasons"
+    ],
+    "title": "Triage",
+    "type": "object"
+   },
+   "TwinOut": {
+    "description": "Такая СТЕ уже есть на портале: то же наименование или та же модель.",
+    "properties": {
+     "by": {
+      "description": "совпало наименование или модель",
+      "enum": [
+       "name",
+       "model"
+      ],
+      "title": "By",
+      "type": "string"
+     },
+     "id": {
+      "title": "Id",
+      "type": "integer"
+     },
+     "name": {
+      "title": "Name",
+      "type": "string"
+     },
+     "same_category": {
+      "description": "в категории, которую определил модуль",
+      "title": "Same Category",
+      "type": "boolean"
+     },
+     "url": {
+      "title": "Url",
+      "type": "string"
+     }
+    },
+    "required": [
+     "id",
+     "name",
+     "url",
+     "by",
+     "same_category"
+    ],
+    "title": "TwinOut",
+    "type": "object"
+   },
+   "ValidationError": {
+    "properties": {
+     "ctx": {
+      "title": "Context",
+      "type": "object"
+     },
+     "input": {
+      "title": "Input"
+     },
+     "loc": {
+      "items": {
+       "anyOf": [
+        {
+         "type": "string"
+        },
+        {
+         "type": "integer"
+        }
+       ]
+      },
+      "title": "Location",
+      "type": "array"
+     },
+     "msg": {
+      "title": "Message",
+      "type": "string"
+     },
+     "type": {
+      "title": "Error Type",
+      "type": "string"
+     }
+    },
+    "required": [
+     "loc",
+     "msg",
+     "type"
+    ],
+    "title": "ValidationError",
+    "type": "object"
+   }
+  }
+ },
+ "info": {
+  "description": "API для Портала поставщиков: описание товара → характеристики, код КТРУ, замечания.",
+  "title": "Модуль автозаполнения характеристик СТЕ",
+  "version": "0.2.0"
+ },
+ "openapi": "3.1.0",
+ "paths": {
+  "/api/demo/photos": {
+   "post": {
+    "description": "Файл сохраняется сразу при выборе в форме, заявка потом ссылается на него (`photo_id`).",
+    "operationId": "post_photo_api_demo_photos_post",
+    "requestBody": {
+     "content": {
+      "multipart/form-data": {
+       "schema": {
+        "$ref": "#/components/schemas/Body_post_photo_api_demo_photos_post"
+       }
+      }
+     },
+     "required": true
+    },
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "additionalProperties": {
+          "type": "integer"
+         },
+         "title": "Response Post Photo Api Demo Photos Post",
+         "type": "object"
+        }
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Фото товара для заявки",
+    "tags": [
+     "стенд портала"
+    ]
+   }
+  },
+  "/api/demo/photos/{photo_id}": {
+   "get": {
+    "operationId": "get_photo_api_demo_photos__photo_id__get",
+    "parameters": [
+     {
+      "in": "path",
+      "name": "photo_id",
+      "required": true,
+      "schema": {
+       "title": "Photo Id",
+       "type": "integer"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "content": {
+       "image/jpeg": {},
+       "image/png": {},
+       "image/webp": {}
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Фото товара заявки",
+    "tags": [
+     "стенд портала"
+    ]
+   }
+  },
+  "/api/demo/submissions": {
+   "get": {
+    "description": "У ждущей решения заявки — `triage`: чистую можно одобрить в один клик, у остальных —\nпочему открыть. Проверка — в пуле потоков: цикл событий API не ждёт очередь.",
+    "operationId": "list_submissions_api_demo_submissions_get",
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "items": {
+          "$ref": "#/components/schemas/QueuedSubmission"
+         },
+         "title": "Response List Submissions Api Demo Submissions Get",
+         "type": "array"
+        }
+       }
+      },
+      "description": "Successful Response"
+     }
+    },
+    "summary": "Очередь модератора, новые сверху",
+    "tags": [
+     "стенд портала"
+    ]
+   },
+   "post": {
+    "operationId": "post_submission_api_demo_submissions_post",
+    "requestBody": {
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/SubmissionIn"
+       }
+      }
+     },
+     "required": true
+    },
+    "responses": {
+     "201": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Submission"
+        }
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Поставщик отправил заявку",
+    "tags": [
+     "стенд портала"
+    ]
+   }
+  },
+  "/api/demo/submissions/accept-clean": {
+   "post": {
+    "description": "Ждущие решения заявки без замечаний модуля (`triage.clean`: ни блокирующих, ни\nпредупреждений, ни подсказок без правки, не исправленные после возврата) одобряются с записью\nв журнале (`decision_note`); остальные ждут модератора. С `ids` — только из этого списка:\nзаявка, пришедшая или изменившаяся после подтверждения, пачкой не уходит.",
+    "operationId": "accept_clean_api_demo_submissions_accept_clean_post",
+    "requestBody": {
+     "content": {
+      "application/json": {
+       "schema": {
+        "anyOf": [
+         {
+          "$ref": "#/components/schemas/AcceptCleanIn"
+         },
+         {
+          "type": "null"
+         }
+        ],
+        "title": "Inp"
+       }
+      }
+     }
+    },
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/AcceptedClean"
+        }
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Одобрить в один клик все чистые заявки",
+    "tags": [
+     "стенд портала"
+    ]
+   }
+  },
+  "/api/demo/submissions/{id}": {
+   "get": {
+    "operationId": "get_submission_api_demo_submissions__id__get",
+    "parameters": [
+     {
+      "in": "path",
+      "name": "id",
+      "required": true,
+      "schema": {
+       "title": "Id",
+       "type": "integer"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/SubmissionView"
+        }
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Заявка с проверкой модуля",
+    "tags": [
+     "стенд портала"
+    ]
+   },
+   "put": {
+    "description": "Заявка снова ждёт решения модератора; прежний текст возврата остаётся в `decision_note`.",
+    "operationId": "put_submission_api_demo_submissions__id__put",
+    "parameters": [
+     {
+      "in": "path",
+      "name": "id",
+      "required": true,
+      "schema": {
+       "title": "Id",
+       "type": "integer"
+      }
+     }
+    ],
+    "requestBody": {
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/SubmissionIn"
+       }
+      }
+     },
+     "required": true
+    },
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Submission"
+        }
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Поставщик исправил возвращённую заявку",
+    "tags": [
+     "стенд портала"
+    ]
+   }
+  },
+  "/api/demo/submissions/{id}/decision": {
+   "post": {
+    "operationId": "post_decision_api_demo_submissions__id__decision_post",
+    "parameters": [
+     {
+      "in": "path",
+      "name": "id",
+      "required": true,
+      "schema": {
+       "title": "Id",
+       "type": "integer"
+      }
+     }
+    ],
+    "requestBody": {
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/DecisionIn"
+       }
+      }
+     },
+     "required": true
+    },
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Submission"
+        }
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Решение модератора",
+    "tags": [
+     "стенд портала"
+    ]
+   }
+  },
+  "/api/health": {
+   "get": {
+    "description": "Процесс жив. Зависимости не трогает.",
+    "operationId": "liveness_api_health_get",
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "additionalProperties": {
+          "type": "string"
+         },
+         "title": "Response Liveness Api Health Get",
+         "type": "object"
+        }
+       }
+      },
+      "description": "Successful Response"
+     }
+    },
+    "summary": "Liveness",
+    "tags": [
+     "health"
+    ]
+   }
+  },
+  "/api/health/ready": {
+   "get": {
+    "description": "Готовность зависимостей: 200 — обязательные в порядке, 503 — одна из обязательных лежит.",
+    "operationId": "readiness_api_health_ready_get",
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Readiness"
+        }
+       }
+      },
+      "description": "Successful Response"
+     }
+    },
+    "summary": "Readiness",
+    "tags": [
+     "health"
+    ]
+   }
+  },
+  "/api/jobs/ping": {
+   "post": {
+    "description": "Ставит проверочную задачу в очередь; воркер отметит её выполненной в Redis.",
+    "operationId": "enqueue_ping_api_jobs_ping_post",
+    "responses": {
+     "202": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/JobAccepted"
+        }
+       }
+      },
+      "description": "Successful Response"
+     }
+    },
+    "summary": "Enqueue Ping",
+    "tags": [
+     "jobs"
+    ]
+   }
+  },
+  "/api/jobs/{job_id}": {
+   "get": {
+    "operationId": "get_job_api_jobs__job_id__get",
+    "parameters": [
+     {
+      "in": "path",
+      "name": "job_id",
+      "required": true,
+      "schema": {
+       "title": "Job Id",
+       "type": "string"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/JobState"
+        }
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Get Job",
+    "tags": [
+     "jobs"
+    ]
+   }
+  },
+  "/api/v1/autofill": {
+   "post": {
+    "description": "Кандидаты КТРУ, характеристики с источником в тексте, замечания и вопрос для сужения.",
+    "operationId": "post_autofill_api_v1_autofill_post",
+    "requestBody": {
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/AutofillIn"
+       }
+      }
+     },
+     "required": true
+    },
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/AutofillOut"
+        }
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Описание поставщика → черновик карточки",
+    "tags": [
+     "модуль"
+    ]
+   }
+  },
+  "/api/v1/autofill/{session_id}/answer": {
+   "post": {
+    "operationId": "post_answer_api_v1_autofill__session_id__answer_post",
+    "parameters": [
+     {
+      "in": "path",
+      "name": "session_id",
+      "required": true,
+      "schema": {
+       "title": "Session Id",
+       "type": "string"
+      }
+     }
+    ],
+    "requestBody": {
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/AnswerIn"
+       }
+      }
+     },
+     "required": true
+    },
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/AutofillOut"
+        }
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Ответ на уточняющий вопрос",
+    "tags": [
+     "модуль"
+    ]
+   }
+  },
+  "/api/v1/batch": {
+   "get": {
+    "description": "Пакеты новые сверху, только счётчики по статусам (строки — `GET /batch/{job_id}/results`).\nПакет живёт свой срок в Redis; истёкший из списка пропадает.",
+    "operationId": "list_batches_api_v1_batch_get",
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "items": {
+          "$ref": "#/components/schemas/BatchState"
+         },
+         "title": "Response List Batches Api V1 Batch Get",
+         "type": "array"
+        }
+       }
+      },
+      "description": "Successful Response"
+     }
+    },
+    "summary": "Последние пакеты: «Мои заявки → Пакеты»",
+    "tags": [
+     "модуль"
+    ]
+   },
+   "post": {
+    "description": "xlsx или csv со списком СТЕ; роли колонок угадываются по содержимому.\n\nОбработка — воркером через очередь; состояние — `GET /api/v1/batch/{job_id}`.",
+    "operationId": "post_batch_api_v1_batch_post",
+    "requestBody": {
+     "content": {
+      "multipart/form-data": {
+       "schema": {
+        "$ref": "#/components/schemas/Body_post_batch_api_v1_batch_post"
+       }
+      }
+     },
+     "required": true
+    },
+    "responses": {
+     "202": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/BatchAccepted"
+        }
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Массовая загрузка: файл в очередь",
+    "tags": [
+     "модуль"
+    ]
+   }
+  },
+  "/api/v1/batch/{job_id}": {
+   "delete": {
+    "description": "Новые строки пропускаются; уже начатые могут завершиться. Повторная отмена безопасна.",
+    "operationId": "cancel_batch_api_v1_batch__job_id__delete",
+    "parameters": [
+     {
+      "in": "path",
+      "name": "job_id",
+      "required": true,
+      "schema": {
+       "title": "Job Id",
+       "type": "string"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/BatchState"
+        }
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Прервать пакет, сохранив частичный результат",
+    "tags": [
+     "модуль"
+    ]
+   },
+   "get": {
+    "description": "Счётчики (`processed`, `counts`) и строки. Большой пакет опрашивают с `limit=0`.",
+    "operationId": "get_batch_api_v1_batch__job_id__get",
+    "parameters": [
+     {
+      "in": "path",
+      "name": "job_id",
+      "required": true,
+      "schema": {
+       "title": "Job Id",
+       "type": "string"
+      }
+     },
+     {
+      "description": "сколько первых строк вернуть: 0 — только счётчики; нет — все",
+      "in": "query",
+      "name": "limit",
+      "required": false,
+      "schema": {
+       "anyOf": [
+        {
+         "minimum": 0,
+         "type": "integer"
+        },
+        {
+         "type": "null"
+        }
+       ],
+       "description": "сколько первых строк вернуть: 0 — только счётчики; нет — все",
+       "title": "Limit"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/BatchState"
+        }
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Состояние пакета",
+    "tags": [
+     "модуль"
+    ]
+   }
+  },
+  "/api/v1/batch/{job_id}/result.xlsx": {
+   "get": {
+    "operationId": "get_batch_result_api_v1_batch__job_id__result_xlsx_get",
+    "parameters": [
+     {
+      "in": "path",
+      "name": "job_id",
+      "required": true,
+      "schema": {
+       "title": "Job Id",
+       "type": "string"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "content": {
+       "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": {}
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Файл с результатом",
+    "tags": [
+     "модуль"
+    ]
+   }
+  },
+  "/api/v1/batch/{job_id}/results": {
+   "get": {
+    "operationId": "get_batch_results_api_v1_batch__job_id__results_get",
+    "parameters": [
+     {
+      "in": "path",
+      "name": "job_id",
+      "required": true,
+      "schema": {
+       "title": "Job Id",
+       "type": "string"
+      }
+     },
+     {
+      "description": "статус строки; нет — все",
+      "in": "query",
+      "name": "status",
+      "required": false,
+      "schema": {
+       "anyOf": [
+        {
+         "enum": [
+          "ready",
+          "needs_answer",
+          "needs_fix",
+          "not_found",
+          "skipped",
+          "failed"
+         ],
+         "type": "string"
+        },
+        {
+         "type": "null"
+        }
+       ],
+       "description": "статус строки; нет — все",
+       "title": "Status"
+      }
+     },
+     {
+      "description": "размер страницы",
+      "in": "query",
+      "name": "limit",
+      "required": false,
+      "schema": {
+       "default": 50,
+       "description": "размер страницы",
+       "maximum": 200,
+       "minimum": 1,
+       "title": "Limit",
+       "type": "integer"
+      }
+     },
+     {
+      "description": "после номера строки, исключительно",
+      "in": "query",
+      "name": "after_row",
+      "required": false,
+      "schema": {
+       "default": 0,
+       "description": "после номера строки, исключительно",
+       "minimum": 0,
+       "title": "After Row",
+       "type": "integer"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/BatchResultPage"
+        }
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Строки пакета с фильтром по статусу",
+    "tags": [
+     "модуль"
+    ]
+   }
+  },
+  "/api/v1/batch/{job_id}/rows/{row}": {
+   "get": {
+    "description": "Наименование, описание и характеристики строки как в файле поставщика (номер с 1).",
+    "operationId": "get_batch_row_api_v1_batch__job_id__rows__row__get",
+    "parameters": [
+     {
+      "in": "path",
+      "name": "job_id",
+      "required": true,
+      "schema": {
+       "title": "Job Id",
+       "type": "string"
+      }
+     },
+     {
+      "in": "path",
+      "name": "row",
+      "required": true,
+      "schema": {
+       "title": "Row",
+       "type": "integer"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/BatchRowIn"
+        }
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Строка файла: открыть её в форме карточки",
+    "tags": [
+     "модуль"
+    ]
+   }
+  },
+  "/api/v1/check": {
+   "post": {
+    "description": "Замечания с обоснованием и ссылкой на правило; нужна поставщику и модератору.",
+    "operationId": "post_check_api_v1_check_post",
+    "requestBody": {
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/CardIn"
+       }
+      }
+     },
+     "required": true
+    },
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/CheckOut"
+        }
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Проверка готовой карточки",
+    "tags": [
+     "модуль"
+    ]
+   }
+  },
+  "/api/v1/extract": {
+   "post": {
+    "operationId": "post_extract_api_v1_extract_post",
+    "requestBody": {
+     "content": {
+      "multipart/form-data": {
+       "schema": {
+        "$ref": "#/components/schemas/Body_post_extract_api_v1_extract_post"
+       }
+      }
+     },
+     "required": true
+    },
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ExtractOut"
+        }
+       }
+      },
+      "description": "Successful Response"
+     },
+     "413": {
+      "description": "больше 10 МБ"
+     },
+     "415": {
+      "description": "не Word, не PDF и не таблица"
+     },
+     "422": {
+      "description": "текста нет (скан PDF) или файл повреждён"
+     }
+    },
+    "summary": "Текст товара из файла: Word, PDF с текстом, таблица",
+    "tags": [
+     "модуль"
+    ]
+   }
+  },
+  "/api/v1/images/category/{portal_id}": {
+   "get": {
+    "operationId": "get_category_image_api_v1_images_category__portal_id__get",
+    "parameters": [
+     {
+      "in": "path",
+      "name": "portal_id",
+      "required": true,
+      "schema": {
+       "maximum": 9007199254740992,
+       "minimum": 1,
+       "title": "Portal Id",
+       "type": "integer"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "content": {
+       "image/jpeg": {}
+      },
+      "description": "JPEG 300×300"
+     },
+     "404": {
+      "description": "картинки нет или портал недоступен"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Картинка категории портала (у карточки без своего фото)",
+    "tags": [
+     "модуль"
+    ]
+   }
+  },
+  "/api/v1/images/sku/{sku_id}": {
+   "get": {
+    "operationId": "get_sku_image_api_v1_images_sku__sku_id__get",
+    "parameters": [
+     {
+      "in": "path",
+      "name": "sku_id",
+      "required": true,
+      "schema": {
+       "maximum": 9007199254740992,
+       "minimum": 1,
+       "title": "Sku Id",
+       "type": "integer"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "content": {
+       "image/jpeg": {}
+      },
+      "description": "JPEG 300×300"
+     },
+     "404": {
+      "description": "картинки нет или портал недоступен"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Фото СТЕ портала (подсказка «похожие» у варианта категории)",
+    "tags": [
+     "модуль"
+    ]
+   }
+  },
+  "/api/v1/ktru/{code}": {
+   "get": {
+    "description": "Категория справочника (`category_code` карточки) или позиция КТРУ второго этапа\n(`ktru_code`): название, путь категории и характеристики для показа рядом с кодом.",
+    "operationId": "get_ktru_api_v1_ktru__code__get",
+    "parameters": [
+     {
+      "in": "path",
+      "name": "code",
+      "required": true,
+      "schema": {
+       "title": "Code",
+       "type": "string"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Position"
+        }
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Позиция справочника или КТРУ",
+    "tags": [
+     "модуль"
+    ]
+   }
+  },
+  "/api/v1/metrics": {
+   "get": {
+    "description": "Результат последнего прогона `python -m app.tools.evaluate`.\n\nУ каждой метрики — значение, размер выборки и способ расчёта.",
+    "operationId": "get_metrics_api_v1_metrics_get",
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/MetricsOut"
+        }
+       }
+      },
+      "description": "Successful Response"
+     }
+    },
+    "summary": "Качество на золотом наборе",
+    "tags": [
+     "модуль"
+    ]
+   }
+  },
+  "/api/v1/metrics/holdout": {
+   "get": {
+    "description": "Результат последнего прогона `python -m app.tools.evaluate_holdout`: СТЕ портала, вынутые\nвместе с двойниками из справочника и индекса похожих СТЕ, — честная мера на живых\nнаименованиях.",
+    "operationId": "get_holdout_report_api_v1_metrics_holdout_get",
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HoldoutOut"
+        }
+       }
+      },
+      "description": "Successful Response"
+     }
+    },
+    "summary": "Отложенная выборка СТЕ портала",
+    "tags": [
+     "модуль"
+    ]
+   }
+  },
+  "/api/v1/metrics/portal": {
+   "get": {
+    "description": "Результат последнего прогона `python -m app.tools.portal_report`.\n\nКарточки СТЕ с публичного API портала: сколько нарушают правила модерации (с примерами-ссылками)\nи насколько значения, извлечённые модулем из текста, совпадают с введёнными поставщиком.",
+    "operationId": "get_portal_report_api_v1_metrics_portal_get",
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/PortalReport"
+        }
+       }
+      },
+      "description": "Successful Response"
+     }
+    },
+    "summary": "Живые карточки портала: аудит и заполнение",
+    "tags": [
+     "модуль"
+    ]
+   }
+  },
+  "/api/v1/settings": {
+   "get": {
+    "operationId": "get_settings_api_v1_settings_get",
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ModuleSettings"
+        }
+       }
+      },
+      "description": "Successful Response"
+     }
+    },
+    "summary": "Настройки модуля",
+    "tags": [
+     "модуль"
+    ]
+   },
+   "put": {
+    "operationId": "put_settings_api_v1_settings_put",
+    "requestBody": {
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/ModuleSettingsIn"
+       }
+      }
+     },
+     "required": true
+    },
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ModuleSettings"
+        }
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Включить или выключить модель (модератор)",
+    "tags": [
+     "модуль"
+    ]
+   }
+  }
+ }
+}
